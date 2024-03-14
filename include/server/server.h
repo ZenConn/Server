@@ -11,4 +11,4 @@ namespace server {
     void run() const;
   };
 
-}  // namespace worker
+}  // namespace server

@@ -4,5 +4,4 @@ using namespace server;
 
 Server::Server() {}
 
-void Server::run() const {
-}
+void Server::run() const {}
