@@ -9,4 +9,4 @@
   <img src="https://avatars.githubusercontent.com/u/159615387?s=400&v=4" height="175" width="auto" />
 </p>
 
-# Server
+  <h1 align="center">Server</h1>
