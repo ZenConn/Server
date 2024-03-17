@@ -33,4 +33,4 @@ add_executable(${PROJECT_NAME} ${sources} ${BEAST_FILES})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 17 OUTPUT_NAME "Server")
 
-target_link_libraries(${PROJECT_NAME} Server::Server cxxopts {Boost_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} Server::Server cxxopts)
