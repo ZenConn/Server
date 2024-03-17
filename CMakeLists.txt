@@ -21,6 +21,8 @@ endif()
 # ---- Add dependencies via CPM ----
 # see https://github.com/TheLartians/CPM.cmake for more info
 
+find_package(Boost 1.84.0 COMPONENTS filesystem regex asio)
+
 include(cmake/CPM.cmake)
 
 # PackageProject.cmake will be used to make our target installable
