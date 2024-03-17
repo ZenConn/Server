@@ -21,6 +21,14 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Install boost
+        uses: MarkusJx/install-boost@v2.4.5
+        id: install-boost
+        with:
+          boost_version: 1.84.0
+          platform_version: 2019
+          toolset: msvc
+
       - uses: actions/cache@v3
         with:
           path: "**/cpm_modules"

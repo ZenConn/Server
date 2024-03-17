@@ -20,6 +20,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Install boost
+        uses: MarkusJx/install-boost@v2.4.5
+        id: install-boost
+        with:
+          boost_version: 1.84.0
+          toolset: clang
+
       - uses: actions/cache@v3
         with:
           path: "**/cpm_modules"
@@ -32,4 +39,4 @@ jobs:
         run: cmake --build build -j4
 
       - name: run
-        run: ./build/Server
+        run: ./build/Server 0.0.0.0 9000 . 4 check
