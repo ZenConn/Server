@@ -22,11 +22,9 @@ endif()
 # see https://github.com/TheLartians/CPM.cmake for more info
 
 find_package(Boost 1.84.0 COMPONENTS filesystem regex)
-
 include_directories(${Boost_INCLUDE_DIRS})
 
 file(GLOB_RECURSE BEAST_FILES ${Boost_INCLUDE_DIRS}/boost/beast/*.hpp ${Boost_INCLUDE_DIRS}/boost/beast/*.ipp)
-
 source_group(TREE ${Boost_INCLUDE_DIRS}/boost/beast PREFIX beast FILES ${BEAST_FILES})
 
 include(cmake/CPM.cmake)
@@ -63,7 +61,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt)
 
 target_include_directories(
   ${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-                         $<INSTALL_INTERFACE:include/${PROJECT_NAME}-${PROJECT_VERSION}>
+                         $<INSTALL_INTERFACE:include/${PROJECT_NAME}-${PROJECT_VERSION} ${Boost_INCLUDE_DIRS}>
 )
 
 # ---- Create an installable target ----
