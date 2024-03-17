@@ -21,6 +21,18 @@ endif()
 # ---- Add dependencies via CPM ----
 # see https://github.com/TheLartians/CPM.cmake for more info
 
+find_package(Boost 1.84.0 COMPONENTS filesystem regex)
+include_directories(${Boost_INCLUDE_DIRS})
+
+file(GLOB_RECURSE BEAST_FILES ${Boost_INCLUDE_DIRS}/boost/beast/*.hpp
+     ${Boost_INCLUDE_DIRS}/boost/beast/*.ipp
+)
+source_group(
+  TREE ${Boost_INCLUDE_DIRS}/boost/beast
+  PREFIX beast
+  FILES ${BEAST_FILES}
+)
+
 include(cmake/CPM.cmake)
 
 # PackageProject.cmake will be used to make our target installable
@@ -31,14 +43,6 @@ CPMAddPackage(
   GIT_TAG 10.2.1
   GITHUB_REPOSITORY fmtlib/fmt
   OPTIONS "FMT_INSTALL YES" # create an installable target
-)
-
-CPMAddPackage(
-  NAME Boost
-  VERSION 1.84.0
-  URL https://github.com/boostorg/boost/releases/download/boost-1.84.0/boost-1.84.0.tar.xz
-  URL_HASH SHA256=2e64e5d79a738d0fa6fb546c6e5c2bd28f88d268a2a080546f74e5ff98f29d0e
-  OPTIONS "BOOST_ENABLE_CMAKE ON" "BOOST_INCLUDE_LIBRARIES system\\\;container"
 )
 
 # ---- Add source files ----
@@ -52,7 +56,7 @@ file(GLOB_RECURSE sources CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/source/
 
 # Note: for header-only libraries change all PUBLIC flags to INTERFACE and create an interface
 # target: add_library(${PROJECT_NAME} INTERFACE)
-add_library(${PROJECT_NAME} ${headers} ${sources})
+add_library(${PROJECT_NAME} ${headers} ${sources} ${BEAST_FILES})
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 17)
 
 # being a cross-platform target, we enforce standards conformance on MSVC

@@ -20,6 +20,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Install boost
+        uses: MarkusJx/install-boost@v2.4.5
+        id: install-boost
+        with:
+          boost_version: 1.84.0
+
       - uses: actions/cache@v3
         with:
           path: "**/cpm_modules"
@@ -27,9 +33,11 @@ jobs:
 
       - name: configure
         run: cmake -Sstandalone -Bbuild -DCMAKE_BUILD_TYPE=Debug
+        env:
+          BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
 
       - name: build
         run: cmake --build build -j4
 
       - name: run
-        run: ./build/Server
+        run: ./build/Server 0.0.0.0 9000 . 4 check
