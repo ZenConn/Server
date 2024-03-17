@@ -17,7 +17,7 @@ TEST_CASE("Server check") {
   char arg_3[] = ".";
   char arg_4[] = "1";
   char arg_5[] = "check";
-  char * argv[] = { nullptr, arg_1, arg_2, arg_3, arg_4, arg_5 };
+  char* argv[] = {nullptr, arg_1, arg_2, arg_3, arg_4, arg_5};
   server.run(argv);
   CHECK_EQ(server.status, ServerStatus::SHUTDOWN);
   CHECK_NE(server.status, ServerStatus::BOOT);

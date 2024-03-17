@@ -1,7 +1,8 @@
 #pragma once
 
-#include <boost/beast.hpp>
 #include <server/version.h>
+
+#include <boost/beast.hpp>
 
 class http {
 public:

@@ -3,8 +3,8 @@
 #include <boost/beast.hpp>
 #include <memory>
 
-#include "websocket_session.h"
 #include "http.h"
+#include "websocket_session.h"
 
 class http_session : public std::enable_shared_from_this<http_session> {
   boost::beast::tcp_stream stream_;

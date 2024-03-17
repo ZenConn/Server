@@ -1,7 +1,8 @@
 #pragma once
 
-#include <boost/beast.hpp>
 #include <server/version.h>
+
+#include <boost/beast.hpp>
 
 #include "failure.h"
 
@@ -11,8 +12,7 @@ class websocket_session : public std::enable_shared_from_this<websocket_session>
 
 public:
   explicit websocket_session(boost::asio::ip::tcp::socket&& socket) : ws_(std::move(socket)) {}
-  template <class Body, class Allocator>
-  void do_accept(
+  template <class Body, class Allocator> void do_accept(
       boost::beast::http::request<Body, boost::beast::http::basic_fields<Allocator>> req) {
     ws_.set_option(
         boost::beast::websocket::stream_base::timeout::suggested(boost::beast::role_type::server));
