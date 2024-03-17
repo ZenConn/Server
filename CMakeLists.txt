@@ -23,6 +23,8 @@ endif()
 
 find_package(Boost 1.84.0 COMPONENTS filesystem regex)
 
+include_directories(${Boost_INCLUDE_DIRS})
+
 file(GLOB_RECURSE BEAST_FILES ${Boost_INCLUDE_DIRS}/boost/beast/*.hpp ${Boost_INCLUDE_DIRS}/boost/beast/*.ipp)
 
 source_group(TREE ${Boost_INCLUDE_DIRS}/boost/beast PREFIX beast FILES ${BEAST_FILES})
