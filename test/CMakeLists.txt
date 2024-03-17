@@ -15,6 +15,14 @@ include(../cmake/tools.cmake)
 
 include(../cmake/CPM.cmake)
 
+find_package(Boost 1.84.0 COMPONENTS filesystem regex)
+include_directories(${Boost_INCLUDE_DIRS})
+
+file(GLOB_RECURSE BEAST_FILES ${Boost_INCLUDE_DIRS}/boost/beast/*.hpp ${Boost_INCLUDE_DIRS}/boost/beast/*.ipp)
+source_group(TREE ${Boost_INCLUDE_DIRS}/boost/beast PREFIX beast FILES ${BEAST_FILES})
+
+file(GLOB sources CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp)
+
 CPMAddPackage("gh:doctest/doctest@2.4.9")
 CPMAddPackage("gh:TheLartians/Format.cmake@1.7.3")
 
@@ -27,7 +35,7 @@ endif()
 # ---- Create binary ----
 
 file(GLOB sources CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp)
-add_executable(${PROJECT_NAME} ${sources})
+add_executable(${PROJECT_NAME} ${sources} ${BEAST_FILES})
 target_link_libraries(${PROJECT_NAME} doctest::doctest Server::Server)
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 17)
 
