@@ -21,6 +21,7 @@ CPMAddPackage(NAME Server SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/..)
 # ---- Create standalone executable ----
 
 find_package(Boost 1.84.0 COMPONENTS filesystem regex)
+include_directories(${Boost_INCLUDE_DIRS})
 
 file(GLOB sources CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp)
 
@@ -32,4 +33,4 @@ add_executable(${PROJECT_NAME} ${sources} ${BEAST_FILES})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 17 OUTPUT_NAME "Server")
 
-target_link_libraries(${PROJECT_NAME} Server::Server cxxopts)
+target_link_libraries(${PROJECT_NAME} Server::Server cxxopts {Boost_LIBRARIES})
