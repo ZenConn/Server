@@ -8,5 +8,10 @@ TEST_CASE("Http::mime_type") {
 
 TEST_CASE("Http::path_cat") {
   std::string output = http::path_cat("/server", "/manifest.json");
+
+#ifdef BOOST_MSVC
+  CHECK_EQ(output, "\\server\\manifest.json");
+#else
   CHECK_EQ(output, "/server/manifest.json");
+#endif
 }
