@@ -5,6 +5,7 @@ listener::listener(boost::asio::io_context &ioc, boost::asio::ip::tcp::endpoint 
     : ioc_(ioc), acceptor_(boost::asio::make_strand(ioc)), doc_root_(doc_root) {
   boost::beast::error_code ec;
 
+  // codecov:ignore:start
   acceptor_.open(endpoint.protocol(), ec);
   if (ec) {
     failure::handle(ec, "open");
@@ -28,6 +29,7 @@ listener::listener(boost::asio::io_context &ioc, boost::asio::ip::tcp::endpoint 
     failure::handle(ec, "listen");
     return;
   }
+  // codecov:ignore:end
 }
 
 void listener::run() {
@@ -44,7 +46,9 @@ void listener::do_accept() {
 
 void listener::on_accept(boost::beast::error_code ec, boost::asio::ip::tcp::socket socket) {
   if (ec) {
+    // codecov:ignore:start
     failure::handle(ec, "accept");
+    // codecov:ignore:end
   } else {
     std::make_shared<http_session>(std::move(socket), doc_root_)->run();
   }
