@@ -10,6 +10,3 @@ TEST_CASE("Http::path_cat") {
   std::string output = http::path_cat("/server", "/manifest.json");
   CHECK_EQ(output, "/server/manifest.json");
 }
-
-
-
