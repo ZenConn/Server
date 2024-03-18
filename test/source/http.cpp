@@ -6,6 +6,11 @@ TEST_CASE("Http::mime_type") {
   CHECK_EQ(std::string(output), std::string("application/text"));
 }
 
+TEST_CASE("Http::mime_type with dot") {
+  boost::beast::string_view output = http::mime_type("app.json");
+  CHECK_EQ(std::string(output), std::string("application/json"));
+}
+
 TEST_CASE("Http::path_cat") {
   std::string output = http::path_cat("/server", "/manifest.json");
 
