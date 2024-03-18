@@ -32,5 +32,6 @@ void Server::run(char* argv[]) {
 
   this->status = ServerStatus::RUNNING;
   ioc.run();
+
   for (auto& t : v) t.join();
 }
