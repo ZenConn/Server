@@ -77,9 +77,7 @@ void http_session::on_write(bool keep_alive, boost::beast::error_code ec,
     return do_close();
   }
 
-  if (do_write()) {
-    do_read();
-  }
+  if (do_write()) do_read();
 }
 
 void http_session::do_close() {
