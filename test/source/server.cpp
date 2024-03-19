@@ -54,16 +54,25 @@ TEST_CASE("Server respond http request") {
                                                                    "/not-found", 10};
   req.set(boost::beast::http::field::host, "localhost");
   req.set(boost::beast::http::field::user_agent, BOOST_BEAST_VERSION_STRING);
+  req.keep_alive(true);
 
   boost::beast::http::write(stream, req);
 
   boost::beast::flat_buffer buffer;
+  boost::beast::flat_buffer buffer_2;
 
   boost::beast::http::response<boost::beast::http::dynamic_body> res;
+  boost::beast::http::response<boost::beast::http::dynamic_body> res_2;
 
   boost::beast::http::read(stream, buffer, res);
 
   auto output = boost::beast::buffers_to_string(res.body().data());
+  CHECK_EQ(output, std::string("The resource '/not-found' was not found."));
+
+  boost::beast::http::write(stream, req);
+  boost::beast::http::read(stream, buffer_2, res_2);
+
+  output = boost::beast::buffers_to_string(res_2.body().data());
   CHECK_EQ(output, std::string("The resource '/not-found' was not found."));
 
   boost::beast::error_code ec;
@@ -72,7 +81,7 @@ TEST_CASE("Server respond http request") {
   if (ec && ec != boost::beast::errc::not_connected) throw boost::beast::system_error{ec};
 }
 
-TEST_CASE("Server respond websocket request") {
+TEST_CASE("Server handle websocket session") {
   using namespace server;
   Server server;
   char arg_1[] = "0.0.0.0";
