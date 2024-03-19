@@ -50,32 +50,32 @@ TEST_CASE("Server can handle http requests") {
 
   stream.connect(results);
 
-  boost::beast::http::request<boost::beast::http::string_body> request_get{boost::beast::http::verb::get,
-                                                                   "/not-found", 10};
+  boost::beast::http::request<boost::beast::http::string_body> request_get{
+      boost::beast::http::verb::get, "/not-found", 10};
   request_get.set(boost::beast::http::field::host, "localhost");
   request_get.set(boost::beast::http::field::user_agent, BOOST_BEAST_VERSION_STRING);
   request_get.keep_alive(true);
 
-  boost::beast::http::request<boost::beast::http::string_body> request_put{boost::beast::http::verb::put,
-                                                                           "/not-found", 10};
+  boost::beast::http::request<boost::beast::http::string_body> request_put{
+      boost::beast::http::verb::put, "/not-found", 10};
   request_put.set(boost::beast::http::field::host, "localhost");
   request_put.set(boost::beast::http::field::user_agent, BOOST_BEAST_VERSION_STRING);
   request_put.keep_alive(true);
 
-  boost::beast::http::request<boost::beast::http::string_body> request_wrong{boost::beast::http::verb::get,
-                                                                           ".not-found", 10};
+  boost::beast::http::request<boost::beast::http::string_body> request_wrong{
+      boost::beast::http::verb::get, ".not-found", 10};
   request_wrong.set(boost::beast::http::field::host, "localhost");
   request_wrong.set(boost::beast::http::field::user_agent, BOOST_BEAST_VERSION_STRING);
   request_wrong.keep_alive(true);
 
-  boost::beast::http::request<boost::beast::http::string_body> request_head{boost::beast::http::verb::head,
-                                                                             "/app.json", 10};
+  boost::beast::http::request<boost::beast::http::string_body> request_head{
+      boost::beast::http::verb::head, "/app.json", 10};
   request_head.set(boost::beast::http::field::host, "localhost");
   request_head.set(boost::beast::http::field::user_agent, BOOST_BEAST_VERSION_STRING);
   request_head.keep_alive(true);
 
-  boost::beast::http::request<boost::beast::http::string_body> request_file{boost::beast::http::verb::get,
-                                                                            "/app.json", 10};
+  boost::beast::http::request<boost::beast::http::string_body> request_file{
+      boost::beast::http::verb::get, "/app.json", 10};
   request_file.set(boost::beast::http::field::host, "localhost");
   request_file.set(boost::beast::http::field::user_agent, BOOST_BEAST_VERSION_STRING);
   request_file.keep_alive(true);
