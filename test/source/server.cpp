@@ -29,7 +29,7 @@ TEST_CASE("Server version") {
   CHECK(std::string(SERVER_VERSION) == std::string("1.0"));
 }
 
-TEST_CASE("Server respond http request") {
+TEST_CASE("Server can handle http requests") {
   using namespace server;
   Server server;
   char arg_1[] = "0.0.0.0";
@@ -50,30 +50,72 @@ TEST_CASE("Server respond http request") {
 
   stream.connect(results);
 
-  boost::beast::http::request<boost::beast::http::string_body> req{boost::beast::http::verb::get,
-                                                                   "/not-found", 10};
-  req.set(boost::beast::http::field::host, "localhost");
-  req.set(boost::beast::http::field::user_agent, BOOST_BEAST_VERSION_STRING);
-  req.keep_alive(true);
+  boost::beast::http::request<boost::beast::http::string_body> request_get{
+      boost::beast::http::verb::get, "/not-found", 10};
+  request_get.set(boost::beast::http::field::host, "localhost");
+  request_get.set(boost::beast::http::field::user_agent, BOOST_BEAST_VERSION_STRING);
+  request_get.keep_alive(true);
 
-  boost::beast::http::write(stream, req);
+  boost::beast::http::request<boost::beast::http::string_body> request_put{
+      boost::beast::http::verb::put, "/not-found", 10};
+  request_put.set(boost::beast::http::field::host, "localhost");
+  request_put.set(boost::beast::http::field::user_agent, BOOST_BEAST_VERSION_STRING);
+  request_put.keep_alive(true);
+
+  boost::beast::http::request<boost::beast::http::string_body> request_wrong{
+      boost::beast::http::verb::get, ".not-found", 10};
+  request_wrong.set(boost::beast::http::field::host, "localhost");
+  request_wrong.set(boost::beast::http::field::user_agent, BOOST_BEAST_VERSION_STRING);
+  request_wrong.keep_alive(true);
+
+  boost::beast::http::request<boost::beast::http::string_body> request_head{
+      boost::beast::http::verb::head, "/app.json", 10};
+  request_head.set(boost::beast::http::field::host, "localhost");
+  request_head.set(boost::beast::http::field::user_agent, BOOST_BEAST_VERSION_STRING);
+  request_head.keep_alive(true);
+
+  boost::beast::http::request<boost::beast::http::string_body> request_file{
+      boost::beast::http::verb::get, "/app.json", 10};
+  request_file.set(boost::beast::http::field::host, "localhost");
+  request_file.set(boost::beast::http::field::user_agent, BOOST_BEAST_VERSION_STRING);
+  request_file.keep_alive(true);
 
   boost::beast::flat_buffer buffer;
   boost::beast::flat_buffer buffer_2;
+  boost::beast::flat_buffer buffer_3;
+  boost::beast::flat_buffer buffer_4;
+  boost::beast::flat_buffer buffer_5;
 
   boost::beast::http::response<boost::beast::http::dynamic_body> res;
   boost::beast::http::response<boost::beast::http::dynamic_body> res_2;
+  boost::beast::http::response<boost::beast::http::dynamic_body> res_3;
+  boost::beast::http::response<boost::beast::http::dynamic_body> res_4;
+  boost::beast::http::response<boost::beast::http::dynamic_body> res_5;
 
+  boost::beast::http::write(stream, request_get);
   boost::beast::http::read(stream, buffer, res);
-
   auto output = boost::beast::buffers_to_string(res.body().data());
   CHECK_EQ(output, std::string("The resource '/not-found' was not found."));
 
-  boost::beast::http::write(stream, req);
+  boost::beast::http::write(stream, request_put);
   boost::beast::http::read(stream, buffer_2, res_2);
-
   output = boost::beast::buffers_to_string(res_2.body().data());
-  CHECK_EQ(output, std::string("The resource '/not-found' was not found."));
+  CHECK_EQ(output, std::string("Unknown HTTP-method"));
+
+  boost::beast::http::write(stream, request_wrong);
+  boost::beast::http::read(stream, buffer_3, res_3);
+  output = boost::beast::buffers_to_string(res_3.body().data());
+  CHECK_EQ(output, std::string("Illegal request-target"));
+
+  boost::beast::http::write(stream, request_head);
+  boost::beast::http::read(stream, buffer_4, res_4);
+  output = boost::beast::buffers_to_string(res_4.body().data());
+  CHECK_EQ(output, std::string(""));
+
+  boost::beast::http::write(stream, request_file);
+  boost::beast::http::read(stream, buffer_5, res_5);
+  output = boost::beast::buffers_to_string(res_5.body().data());
+  CHECK_EQ(output, std::string(""));
 
   boost::beast::error_code ec;
   stream.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
@@ -81,7 +123,7 @@ TEST_CASE("Server respond http request") {
   if (ec && ec != boost::beast::errc::not_connected) throw boost::beast::system_error{ec};
 }
 
-TEST_CASE("Server handle websocket session") {
+TEST_CASE("Server can handle websocket sessions") {
   using namespace server;
   Server server;
   char arg_1[] = "0.0.0.0";
