@@ -53,4 +53,5 @@ jobs:
       - name: test
         run: |
           cd build
+          touch app.json
           ctest --build-config Debug
