@@ -16,8 +16,7 @@ class listener : public std::enable_shared_from_this<listener> {
 
 public:
   listener(boost::asio::io_context& ioc, boost::asio::ip::tcp::endpoint endpoint,
-           std::shared_ptr<std::string const> const& doc_root,
-           std::shared_ptr<state> const& state);
+           std::shared_ptr<std::string const> const& doc_root, std::shared_ptr<state> const& state);
 
   void run();
 

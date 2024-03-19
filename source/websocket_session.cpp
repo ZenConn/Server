@@ -1,5 +1,5 @@
-#include <server/websocket_session.h>
 #include <server/state.h>
+#include <server/websocket_session.h>
 
 void websocket_session::on_accept(boost::beast::error_code ec) {
   if (ec) return failure::handle(ec, "accept");

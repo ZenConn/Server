@@ -21,7 +21,6 @@ public:
       : ws_(std::move(socket)), state_(state) {}
   template <class Body, class Allocator> void do_accept(
       boost::beast::http::request<Body, boost::beast::http::basic_fields<Allocator>> req) {
-
     ws_.set_option(
         boost::beast::websocket::stream_base::timeout::suggested(boost::beast::role_type::server));
 
