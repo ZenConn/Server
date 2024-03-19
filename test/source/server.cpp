@@ -16,7 +16,7 @@ TEST_CASE("Server check") {
   char arg_2[] = "9000";
   char arg_3[] = "1";
   char arg_4[] = "check";
-  char* argv[] = { nullptr, arg_1, arg_2, arg_3, arg_4 };
+  char* argv[] = {nullptr, arg_1, arg_2, arg_3, arg_4};
   server.run(argv);
   CHECK_EQ(server.status, ServerStatus::SHUTDOWN);
   CHECK_NE(server.status, ServerStatus::BOOT);
@@ -35,7 +35,7 @@ TEST_CASE("Server can handle http requests") {
   char arg_2[] = "9000";
   char arg_3[] = "1";
   char arg_4[] = "run";
-  char* argv[] = {nullptr, arg_1, arg_2, arg_3, arg_4 };
+  char* argv[] = {nullptr, arg_1, arg_2, arg_3, arg_4};
 
   auto thread = std::thread([&]() { server.run(argv); });
   thread.detach();
@@ -128,7 +128,7 @@ TEST_CASE("Server can handle websocket sessions") {
   char arg_2[] = "9000";
   char arg_3[] = "1";
   char arg_4[] = "run";
-  char* argv[] = {nullptr, arg_1, arg_2, arg_3, arg_4 };
+  char* argv[] = {nullptr, arg_1, arg_2, arg_3, arg_4};
 
   auto thread = std::thread([&]() { server.run(argv); });
   thread.detach();
