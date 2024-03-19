@@ -38,4 +38,5 @@ private:
   void do_read();
   void on_read(boost::beast::error_code ec, std::size_t bytes_transferred);
   void on_write(boost::beast::error_code ec, std::size_t bytes_transferred);
+  void on_error(boost::system::error_code ec, char const* what, bool disconnected);
 };

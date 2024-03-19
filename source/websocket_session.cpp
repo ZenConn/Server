@@ -2,7 +2,7 @@
 #include <server/websocket_session.h>
 
 void websocket_session::on_accept(boost::beast::error_code ec) {
-  if (ec) return failure::handle(ec, "accept");
+  if (ec) return on_error(ec, "accept", true);
 
   session_ = std::make_shared<session>();
   state_->connected(session_);
@@ -18,12 +18,9 @@ void websocket_session::do_read() {
 void websocket_session::on_read(boost::beast::error_code ec, std::size_t bytes_transferred) {
   boost::ignore_unused(bytes_transferred);
 
-  if (ec == boost::beast::websocket::error::closed) {
-    state_->disconnected(session_);
-    return;
-  }
+  if (ec == boost::beast::websocket::error::closed) return on_error(ec, "closed", true);
 
-  if (ec) failure::handle(ec, "read");
+  if (ec) on_error(ec, "read", false);
 
   ws_.text(ws_.got_text());
   ws_.async_write(buffer_.data(), boost::beast::bind_front_handler(&websocket_session::on_write,
@@ -33,12 +30,15 @@ void websocket_session::on_read(boost::beast::error_code ec, std::size_t bytes_t
 void websocket_session::on_write(boost::beast::error_code ec, std::size_t bytes_transferred) {
   boost::ignore_unused(bytes_transferred);
 
-  if (ec) {
-    state_->disconnected(session_);
-    return failure::handle(ec, "write");
-  }
+  if (ec) return on_error(ec, "write", true);
 
   buffer_.consume(buffer_.size());
 
   do_read();
+}
+
+void websocket_session::on_error(boost::system::error_code ec, char const* what,
+                                 bool disconnected) {
+  if (disconnected) state_->disconnected(session_);
+  failure::handle(ec, what);
 }
