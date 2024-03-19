@@ -14,10 +14,9 @@ TEST_CASE("Server check") {
   Server server;
   char arg_1[] = "0.0.0.0";
   char arg_2[] = "9000";
-  char arg_3[] = ".";
-  char arg_4[] = "1";
-  char arg_5[] = "check";
-  char* argv[] = {nullptr, arg_1, arg_2, arg_3, arg_4, arg_5};
+  char arg_3[] = "1";
+  char arg_4[] = "check";
+  char* argv[] = {nullptr, arg_1, arg_2, arg_3, arg_4};
   server.run(argv);
   CHECK_EQ(server.status, ServerStatus::SHUTDOWN);
   CHECK_NE(server.status, ServerStatus::BOOT);
@@ -34,10 +33,9 @@ TEST_CASE("Server can handle http requests") {
   Server server;
   char arg_1[] = "0.0.0.0";
   char arg_2[] = "9000";
-  char arg_3[] = ".";
-  char arg_4[] = "1";
-  char arg_5[] = "run";
-  char* argv[] = {nullptr, arg_1, arg_2, arg_3, arg_4, arg_5};
+  char arg_3[] = "1";
+  char arg_4[] = "run";
+  char* argv[] = {nullptr, arg_1, arg_2, arg_3, arg_4};
 
   auto thread = std::thread([&]() { server.run(argv); });
   thread.detach();
@@ -78,19 +76,27 @@ TEST_CASE("Server can handle http requests") {
       boost::beast::http::verb::get, "/app.json", 10};
   request_file.set(boost::beast::http::field::host, "localhost");
   request_file.set(boost::beast::http::field::user_agent, BOOST_BEAST_VERSION_STRING);
-  request_file.keep_alive(false);
+  request_file.keep_alive(true);
+
+  boost::beast::http::request<boost::beast::http::string_body> request_exception{
+      boost::beast::http::verb::get, "/exception", 10};
+  request_exception.set(boost::beast::http::field::host, "localhost");
+  request_exception.set(boost::beast::http::field::user_agent, BOOST_BEAST_VERSION_STRING);
+  request_exception.keep_alive(false);
 
   boost::beast::flat_buffer buffer;
   boost::beast::flat_buffer buffer_2;
   boost::beast::flat_buffer buffer_3;
   boost::beast::flat_buffer buffer_4;
   boost::beast::flat_buffer buffer_5;
+  boost::beast::flat_buffer buffer_6;
 
   boost::beast::http::response<boost::beast::http::dynamic_body> res;
   boost::beast::http::response<boost::beast::http::dynamic_body> res_2;
   boost::beast::http::response<boost::beast::http::dynamic_body> res_3;
   boost::beast::http::response<boost::beast::http::dynamic_body> res_4;
   boost::beast::http::response<boost::beast::http::dynamic_body> res_5;
+  boost::beast::http::response<boost::beast::http::dynamic_body> res_6;
 
   boost::beast::http::write(stream, request_get);
   boost::beast::http::read(stream, buffer, res);
@@ -117,6 +123,11 @@ TEST_CASE("Server can handle http requests") {
   output = boost::beast::buffers_to_string(res_5.body().data());
   CHECK_EQ(output, std::string(""));
 
+  boost::beast::http::write(stream, request_exception);
+  boost::beast::http::read(stream, buffer_6, res_6);
+  output = boost::beast::buffers_to_string(res_6.body().data());
+  CHECK_EQ(output, std::string("An error occurred: 'User-triggered error'"));
+
   boost::beast::error_code ec;
   stream.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
 
@@ -128,10 +139,9 @@ TEST_CASE("Server can handle websocket sessions") {
   Server server;
   char arg_1[] = "0.0.0.0";
   char arg_2[] = "9000";
-  char arg_3[] = ".";
-  char arg_4[] = "1";
-  char arg_5[] = "run";
-  char* argv[] = {nullptr, arg_1, arg_2, arg_3, arg_4, arg_5};
+  char arg_3[] = "1";
+  char arg_4[] = "run";
+  char* argv[] = {nullptr, arg_1, arg_2, arg_3, arg_4};
 
   auto thread = std::thread([&]() { server.run(argv); });
   thread.detach();
