@@ -4,6 +4,7 @@
 #include <string>
 
 #include "listener.h"
+#include "state.h"
 
 enum ServerStatus {
   BOOT,

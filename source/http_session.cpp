@@ -1,8 +1,9 @@
 #include <server/http_session.h>
 
 http_session::http_session(boost::asio::ip::tcp::socket &&socket,
-                           const std::shared_ptr<const std::string> &doc_root)
-    : stream_(std::move(socket)), doc_root_(doc_root) {
+                           const std::shared_ptr<const std::string> &doc_root,
+                           const std::shared_ptr<state> &state)
+    : stream_(std::move(socket)), doc_root_(doc_root), state_(state) {
   static_assert(queue_limit > 0, "queue limit must be positive");
   response_queue_.reserve(queue_limit);
 }
@@ -39,7 +40,8 @@ void http_session::on_read(boost::beast::error_code ec, std::size_t bytes_transf
   if (ec) return failure::handle(ec, "read");
 
   if (boost::beast::websocket::is_upgrade(parser_->get())) {
-    std::make_shared<websocket_session>(stream_.release_socket())->do_accept(parser_->release());
+    std::make_shared<websocket_session>(stream_.release_socket(), state_)
+        ->do_accept(parser_->release());
     return;
   }
 
@@ -75,9 +77,7 @@ void http_session::on_write(bool keep_alive, boost::beast::error_code ec,
     return do_close();
   }
 
-  if (do_write()) {
-    do_read();
-  }
+  if (do_write()) do_read();
 }
 
 void http_session::do_close() {

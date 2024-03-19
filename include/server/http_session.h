@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "http.h"
+#include "state.h"
 #include "websocket_session.h"
 
 class http_session : public std::enable_shared_from_this<http_session> {
@@ -13,10 +14,12 @@ class http_session : public std::enable_shared_from_this<http_session> {
   static constexpr std::size_t queue_limit = 8;  // max responses
   std::vector<boost::beast::http::message_generator> response_queue_;
   boost::optional<boost::beast::http::request_parser<boost::beast::http::string_body>> parser_;
+  std::shared_ptr<state> state_;
 
 public:
   http_session(boost::asio::ip::tcp::socket&& socket,
-               std::shared_ptr<std::string const> const& doc_root);
+               std::shared_ptr<std::string const> const& doc_root,
+               std::shared_ptr<state> const& state);
   void run();
 
 private:

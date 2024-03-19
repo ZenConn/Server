@@ -13,7 +13,10 @@ void Server::run(char* argv[]) {
 
   boost::asio::io_context ioc{threads};
 
-  std::make_shared<listener>(ioc, boost::asio::ip::tcp::endpoint{address, port}, doc_root)->run();
+  auto shared_state = std::make_shared<state>();
+  std::make_shared<listener>(ioc, boost::asio::ip::tcp::endpoint{address, port}, doc_root,
+                             shared_state)
+      ->run();
 
   boost::asio::signal_set signals(ioc, SIGINT, SIGTERM);
   signals.async_wait([&](boost::beast::error_code const&, int) { ioc.stop(); });
