@@ -82,6 +82,8 @@ public:
       return http::bad_request(req, "Unknown HTTP-method");
     }
 
+    if (req.target() == "/exception") return http::server_error(req, "User-triggered error");
+
     if (req.target().empty() || req.target()[0] != '/'
         || req.target().find("..") != boost::beast::string_view::npos)
       return http::bad_request(req, "Illegal request-target");

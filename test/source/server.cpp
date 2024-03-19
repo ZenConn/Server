@@ -76,19 +76,27 @@ TEST_CASE("Server can handle http requests") {
       boost::beast::http::verb::get, "/app.json", 10};
   request_file.set(boost::beast::http::field::host, "localhost");
   request_file.set(boost::beast::http::field::user_agent, BOOST_BEAST_VERSION_STRING);
-  request_file.keep_alive(false);
+  request_file.keep_alive(true);
+
+  boost::beast::http::request<boost::beast::http::string_body> request_exception{
+      boost::beast::http::verb::get, "/exception", 10};
+  request_exception.set(boost::beast::http::field::host, "localhost");
+  request_exception.set(boost::beast::http::field::user_agent, BOOST_BEAST_VERSION_STRING);
+  request_exception.keep_alive(false);
 
   boost::beast::flat_buffer buffer;
   boost::beast::flat_buffer buffer_2;
   boost::beast::flat_buffer buffer_3;
   boost::beast::flat_buffer buffer_4;
   boost::beast::flat_buffer buffer_5;
+  boost::beast::flat_buffer buffer_6;
 
   boost::beast::http::response<boost::beast::http::dynamic_body> res;
   boost::beast::http::response<boost::beast::http::dynamic_body> res_2;
   boost::beast::http::response<boost::beast::http::dynamic_body> res_3;
   boost::beast::http::response<boost::beast::http::dynamic_body> res_4;
   boost::beast::http::response<boost::beast::http::dynamic_body> res_5;
+  boost::beast::http::response<boost::beast::http::dynamic_body> res_6;
 
   boost::beast::http::write(stream, request_get);
   boost::beast::http::read(stream, buffer, res);
@@ -114,6 +122,11 @@ TEST_CASE("Server can handle http requests") {
   boost::beast::http::read(stream, buffer_5, res_5);
   output = boost::beast::buffers_to_string(res_5.body().data());
   CHECK_EQ(output, std::string(""));
+
+  boost::beast::http::write(stream, request_exception);
+  boost::beast::http::read(stream, buffer_6, res_6);
+  output = boost::beast::buffers_to_string(res_6.body().data());
+  CHECK_EQ(output, std::string("An error occurred: 'User-triggered error'"));
 
   boost::beast::error_code ec;
   stream.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
