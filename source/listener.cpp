@@ -37,9 +37,7 @@ void listener::do_accept() {
 
 void listener::on_accept(boost::beast::error_code ec, boost::asio::ip::tcp::socket socket) {
   if (ec) failure::handle(ec, "accept");
-  else {
-    std::make_shared<http_session>(std::move(socket), doc_root_, state_)->run();
-  }
+  if (!ec) std::make_shared<http_session>(std::move(socket), doc_root_, state_)->run();
 
   do_accept();
 }
