@@ -78,7 +78,7 @@ TEST_CASE("Server can handle http requests") {
       boost::beast::http::verb::get, "/app.json", 10};
   request_file.set(boost::beast::http::field::host, "localhost");
   request_file.set(boost::beast::http::field::user_agent, BOOST_BEAST_VERSION_STRING);
-  request_file.keep_alive(true);
+  request_file.keep_alive(false);
 
   boost::beast::flat_buffer buffer;
   boost::beast::flat_buffer buffer_2;
