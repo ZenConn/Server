@@ -34,7 +34,6 @@ void websocket_session::on_write(boost::beast::error_code ec, std::size_t bytes_
   boost::ignore_unused(bytes_transferred);
 
   if (ec) {
-    auto self = shared_from_this();
     state_->disconnected(session_);
     return failure::handle(ec, "write");
   }
