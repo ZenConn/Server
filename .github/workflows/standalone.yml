@@ -40,4 +40,4 @@ jobs:
         run: cmake --build build -j4
 
       - name: run
-        run: ./build/Server 0.0.0.0 9000 . 4 check
+        run: ./build/Server 0.0.0.0 9000 4 check

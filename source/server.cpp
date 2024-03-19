@@ -7,9 +7,9 @@ Server::Server() {}
 void Server::run(char* argv[]) {
   auto const address = boost::asio::ip::make_address(argv[1]);
   auto const port = static_cast<unsigned short>(std::atoi(argv[2]));
-  auto const doc_root = std::make_shared<std::string>(argv[3]);
-  auto const threads = std::max<int>(1, std::atoi(argv[4]));
-  auto const mode = std::string(argv[5]);
+  auto const doc_root = std::make_shared<std::string>("public");
+  auto const threads = std::max<int>(1, std::atoi(argv[3]));
+  auto const mode = std::string(argv[4]);
 
   boost::asio::io_context ioc{threads};
 
