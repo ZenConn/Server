@@ -4,7 +4,6 @@
 #include <iostream>
 
 auto main(int argc, char* argv[]) -> int {
-
   if (argc != 5) {
     std::cerr << "Usage: advanced-server <address> <port> <threads> <run|check>\n"
               << "Example:\n"
