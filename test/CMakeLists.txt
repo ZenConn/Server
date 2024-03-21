@@ -18,6 +18,8 @@ include(../cmake/CPM.cmake)
 find_package(Boost 1.84.0 COMPONENTS filesystem regex)
 include_directories(${Boost_INCLUDE_DIRS})
 
+find_package(OpenSSL REQUIRED)
+
 file(GLOB_RECURSE BEAST_FILES ${Boost_INCLUDE_DIRS}/boost/beast/*.hpp
      ${Boost_INCLUDE_DIRS}/boost/beast/*.ipp
 )
@@ -42,7 +44,7 @@ endif()
 
 file(GLOB sources CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp)
 add_executable(${PROJECT_NAME} ${sources} ${BEAST_FILES})
-target_link_libraries(${PROJECT_NAME} doctest::doctest Server::Server)
+target_link_libraries(${PROJECT_NAME} doctest::doctest Server::Server OpenSSL::Crypto OpenSSL::SSL)
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 17)
 
 # enable compiler warnings
