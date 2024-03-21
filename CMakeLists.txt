@@ -24,6 +24,8 @@ endif()
 find_package(Boost 1.84.0 COMPONENTS filesystem regex)
 include_directories(${Boost_INCLUDE_DIRS})
 
+find_package(OpenSSL REQUIRED)
+
 file(GLOB_RECURSE BEAST_FILES ${Boost_INCLUDE_DIRS}/boost/beast/*.hpp
      ${Boost_INCLUDE_DIRS}/boost/beast/*.ipp
 )
@@ -63,7 +65,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 17)
 target_compile_options(${PROJECT_NAME} PUBLIC "$<$<COMPILE_LANG_AND_ID:CXX,MSVC>:/permissive->")
 
 # Link dependencies
-target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt)
+target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt OpenSSL::Crypto OpenSSL::SSL)
 
 target_include_directories(
   ${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>

@@ -12,8 +12,17 @@ jobs:
   build:
     name: Build and publish documentation
     runs-on: macos-latest
+
     steps:
       - uses: actions/checkout@v3
+
+      - uses: shogo82148/actions-setup-mysql@v1
+        with:
+          mysql-version: "8.1"
+          user: "app"
+          password: "secret_password"
+
+      - run: mysql -uroot -e 'CREATE DATABASE zenconn;'
 
       - name: Install boost
         uses: MarkusJx/install-boost@v2.4.5
