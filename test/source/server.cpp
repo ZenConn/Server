@@ -42,7 +42,6 @@ TEST_CASE("Server can handle http requests") {
 
   // Wait for booting
   while (server.status != ServerStatus::RUNNING) {
-    usleep(1);
   };
 
   boost::asio::io_context ioc;
@@ -153,7 +152,6 @@ TEST_CASE("Server can handle websocket sessions") {
 
   // Wait for booting
   while (server.status != ServerStatus::RUNNING) {
-    usleep(1);
   };
 
   boost::asio::io_context ioc;
