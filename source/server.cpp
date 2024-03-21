@@ -1,3 +1,4 @@
+#include <server/dotenv.h>
 #include <server/server.h>
 
 using namespace server;
@@ -13,7 +14,24 @@ void Server::run(char* argv[]) {
 
   boost::asio::io_context ioc{threads};
 
-  auto shared_state = std::make_shared<state>();
+  std::string database_username = dotenv::getenv("DATABASE_USERNAME", "user"),
+              database_password = dotenv::getenv("DATABASE_PASSWORD", ""),
+              database_name = dotenv::getenv("DATABASE_NAME", "app"),
+              database_host = dotenv::getenv("DATABASE_HOST", "localhost"),
+              database_port = dotenv::getenv("DATABASE_PORT", boost::mysql::default_port_string);
+
+  boost::asio::io_context database_ioc;
+  boost::asio::ssl::context database_ssl_ioc(boost::asio::ssl::context::tls_client);
+  boost::asio::ip::tcp::resolver database_resolver(database_ioc.get_executor());
+  boost::mysql::handshake_params database_params(database_username, database_password,
+                                                 database_name);
+
+  boost::asio::ip::basic_resolver_results<boost::asio::ip::tcp> database_endpoints
+      = database_resolver.resolve(database_host, database_port);
+
+  auto shared_state = std::make_shared<state>(database_ioc, database_ssl_ioc, database_params,
+                                              database_endpoints);
+
   std::make_shared<listener>(ioc, boost::asio::ip::tcp::endpoint{address, port}, doc_root,
                              shared_state)
       ->run();

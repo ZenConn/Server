@@ -40,6 +40,11 @@ TEST_CASE("Server can handle http requests") {
   auto thread = std::thread([&]() { server.run(argv); });
   thread.detach();
 
+  // Wait for booting
+  while (server.status != ServerStatus::RUNNING) {
+    usleep(1);
+  };
+
   boost::asio::io_context ioc;
   boost::asio::ip::tcp::resolver resolver(ioc);
   boost::beast::tcp_stream stream(ioc);
@@ -145,6 +150,11 @@ TEST_CASE("Server can handle websocket sessions") {
 
   auto thread = std::thread([&]() { server.run(argv); });
   thread.detach();
+
+  // Wait for booting
+  while (server.status != ServerStatus::RUNNING) {
+    usleep(1);
+  };
 
   boost::asio::io_context ioc;
 
