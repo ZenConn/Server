@@ -14,7 +14,7 @@ class state : public std::enable_shared_from_this<state> {
 public:
   state(boost::asio::io_context& database_ioc, boost::asio::ssl::context& database_ssl_ioc,
         boost::mysql::handshake_params& database_params,
-        boost::asio::ip::basic_resolver_results<boost::asio::ip::tcp> & database_endpoints)
+        boost::asio::ip::basic_resolver_results<boost::asio::ip::tcp>& database_endpoints)
       : uuid_(boost::uuids::random_generator()()),
         database_(database_ioc, database_ssl_ioc, database_params, database_endpoints) {}
   std::string get_uuid() { return boost::uuids::to_string(uuid_); }
