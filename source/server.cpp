@@ -14,10 +14,10 @@ void Server::run(char* argv[]) {
 
   boost::asio::io_context ioc{threads};
 
-  std::string database_username = dotenv::getenv("DATABASE_USERNAME", "user"),
+  std::string database_username = dotenv::getenv("DATABASE_USERNAME", "root"),
               database_password = dotenv::getenv("DATABASE_PASSWORD", ""),
-              database_name = dotenv::getenv("DATABASE_NAME", "app"),
-              database_host = dotenv::getenv("DATABASE_HOST", "localhost"),
+              database_name = dotenv::getenv("DATABASE_NAME", "zenconn"),
+              database_host = dotenv::getenv("DATABASE_HOST", "mysql"),
               database_port = dotenv::getenv("DATABASE_PORT", boost::mysql::default_port_string);
 
   boost::asio::io_context database_ioc;
