@@ -31,17 +31,7 @@ void Server::run(char* argv[]) {
       database_host{config.at("database").as_object().at("host").as_string()},
       database_port{config.at("database").as_object().at("port").as_string()};
 
-  boost::asio::io_context database_ioc;
-  boost::asio::ssl::context database_ssl_ioc(boost::asio::ssl::context::tls_client);
-  boost::asio::ip::tcp::resolver database_resolver(database_ioc.get_executor());
-  boost::mysql::handshake_params database_params(database_username, database_password,
-                                                 database_name);
-
-  boost::asio::ip::basic_resolver_results<boost::asio::ip::tcp> database_endpoints
-      = database_resolver.resolve(database_host, database_port);
-
-  auto shared_state = std::make_shared<state>(config.as_object(), database_ioc, database_ssl_ioc,
-                                              database_params, database_endpoints);
+  auto shared_state = std::make_shared<state>(config.as_object());
 
   std::make_shared<listener>(ioc, boost::asio::ip::tcp::endpoint{address, port}, doc_root,
                              shared_state)

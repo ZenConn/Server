@@ -12,15 +12,30 @@
 
 class database_connection {
   std::shared_ptr<boost::mysql::tcp_ssl_connection> connection_;
+  boost::asio::io_context ioc_;
+  boost::asio::ssl::context ssl_ioc_;
 
 public:
   std::shared_ptr<std::mutex> ac_guard_;
   std::shared_ptr<std::mutex> op_guard_;
   bool locked = false;
-  explicit database_connection(std::shared_ptr<boost::mysql::tcp_ssl_connection> connection)
-      : connection_(std::move(connection)),
+  explicit database_connection(boost::json::object& config)
+      : ssl_ioc_(boost::asio::ssl::context::tls_client),
         ac_guard_(std::make_shared<std::mutex>()),
-        op_guard_(std::make_shared<std::mutex>()) {}
+        op_guard_(std::make_shared<std::mutex>()) {
+    connection_ = std::make_shared<boost::mysql::tcp_ssl_connection>(ioc_.get_executor(), ssl_ioc_);
+    boost::asio::ip::tcp::resolver database_resolver(ioc_.get_executor());
+    boost::asio::ip::basic_resolver_results<boost::asio::ip::tcp> database_endpoint
+        = database_resolver.resolve(config.at("database").as_object().at("host").as_string(),
+                                    config.at("database").as_object().at("port").as_string());
+
+    boost::mysql::handshake_params database_params(
+        config.at("database").as_object().at("username").as_string(),
+        config.at("database").as_object().at("password").as_string(),
+        config.at("database").as_object().at("name").as_string());
+
+    connection_->connect(*database_endpoint.begin(), database_params);
+  }
 
   void release() { this->locked = false; }
   void lock() { this->locked = true; }
@@ -28,22 +43,14 @@ public:
 };
 
 class database {
-  boost::asio::io_context& ioc_;
-  boost::asio::ssl::context& ssl_ioc_;
-  boost::mysql::handshake_params& params_;
-  boost::asio::ip::basic_resolver_results<boost::asio::ip::tcp> endpoints_;
+  boost::json::object config_;
   std::vector<std::shared_ptr<database_connection>> connections_;
 
 public:
-  database(boost::asio::io_context& ioc, boost::asio::ssl::context& ssl_ioc,
-           boost::mysql::handshake_params& params,
-           boost::asio::ip::basic_resolver_results<boost::asio::ip::tcp>& endpoints)
-      : ioc_(ioc), ssl_ioc_(ssl_ioc), params_(params), endpoints_(endpoints) {}
+  explicit database(boost::json::object& config) : config_(config) {}
 
   std::shared_ptr<database_connection> create_connection() {
-    auto conn = std::make_shared<boost::mysql::tcp_ssl_connection>(ioc_.get_executor(), ssl_ioc_);
-    conn->connect(*endpoints_.begin(), params_);
-    return std::make_shared<database_connection>(conn);
+    return std::make_shared<database_connection>(config_);
   }
 
   void prepare_connections(uint64_t connections) {
