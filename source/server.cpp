@@ -57,13 +57,15 @@ void Server::run(char* argv[]) {
   if (mode == "check") {
     boost::asio::steady_timer timer(ioc, boost::asio::chrono::seconds(10));
     timer.async_wait([&](boost::system::error_code) {
-      this->status = ServerStatus::SHUTDOWN;
       ioc.stop();
     });
   }
 
   this->status = ServerStatus::RUNNING;
   ioc.run();
+
+  this->status = ServerStatus::SHUTDOWN;
+  shared_state->shutdown();
 
   for (auto& t : v) t.join();
 }

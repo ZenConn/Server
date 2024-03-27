@@ -22,7 +22,7 @@ public:
         database_(database_ioc, database_ssl_ioc, database_params, database_endpoints) {
     this->database_.prepare_connections(
         config_.at("database").as_object().at("connections").as_int64());
-    this->database_.insert_server(uuid_);
+    this->database_.server_start(uuid_);
   }
   std::string get_uuid() { return boost::uuids::to_string(uuid_); }
 
@@ -31,4 +31,6 @@ public:
   void disconnected(std::shared_ptr<session>& session) {
     std::remove(this->sessions_.begin(), this->sessions_.end(), session);
   }
+
+  void shutdown() { this->database_.server_shutdown(uuid_); }
 };

@@ -62,13 +62,25 @@ public:
     }
   }
 
-  void insert_server(boost::uuids::uuid& uuid) {
+  void server_start(boost::uuids::uuid& uuid) {
     auto conn = get_connection();
     std::scoped_lock<std::mutex> guard(*conn->op_guard_);
     std::string query = "INSERT INTO servers (uuid) VALUES (?)";
     auto statement = conn->get()->prepare_statement(query);
     boost::mysql::results result;
     conn->get()->execute(statement.bind(boost::uuids::to_string(uuid)), result);
+    conn->get()->close_statement(statement);
+    conn->release();
+  }
+
+  void server_shutdown(boost::uuids::uuid& uuid) {
+    auto conn = get_connection();
+    std::scoped_lock<std::mutex> guard(*conn->op_guard_);
+    std::string query = "UPDATE servers SET shutdown_at = now() WHERE uuid = ?";
+    auto statement = conn->get()->prepare_statement(query);
+    boost::mysql::results result;
+    conn->get()->execute(statement.bind(boost::uuids::to_string(uuid)), result);
+    conn->get()->close_statement(statement);
     conn->release();
   }
 };
