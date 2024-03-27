@@ -47,5 +47,8 @@ jobs:
       - name: build
         run: cmake --build build -j4
 
+      - name: get config
+        run: echo $CONFIG_CHECK >> build/config_check.json
+
       - name: run
-        run: ./build/Server 0.0.0.0 9000 4 check
+        run: ./build/Server config_check.json

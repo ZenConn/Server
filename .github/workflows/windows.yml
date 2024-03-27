@@ -53,4 +53,6 @@ jobs:
       - name: test
         run: |
           cd build
+          echo $CONFIG_CHECK >> config_check.json
+          echo $CONFIG_RUN >> config_run.json
           ctest --build-config Debug
