@@ -28,7 +28,7 @@ jobs:
           user: "app"
           password: "secret_password"
 
-      - run: mysql -uroot -e 'CREATE DATABASE zenconn;'
+      - run: mysql -uroot < db.sql
 
       - name: Install boost
         uses: MarkusJx/install-boost@v2.4.5
