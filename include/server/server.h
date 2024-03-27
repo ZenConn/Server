@@ -29,59 +29,45 @@ namespace server {
 
     void run(char* argv[]);
     void static validates(boost::json::object& config) {
-      if (!config.contains("host") || !config.at("host").is_string()) {
-        std::cout << "'host' is required and must be an string." << '\n';
-        throw ConfigValidationException();
-      }
+      std::vector<std::tuple<bool, std::string>> errors;
 
-      if (!config.contains("port") || !config.at("port").is_string()) {
-        std::cout << "'port' is required and must be an string." << '\n';
-        throw ConfigValidationException();
-      }
+      errors.emplace_back(!config.contains("host") || !config.at("host").is_string(),
+                          "'host' is required and must be an string.");
 
-      if (!config.contains("threads") || !config.at("threads").is_number()) {
-        std::cout << "'threads' is required and must be a number." << '\n';
-        throw ConfigValidationException();
-      }
+      errors.emplace_back(!config.contains("port") || !config.at("port").is_string(),
+                          "'port' is required and must be an string.");
 
-      if (!config.contains("mode") || !config.at("mode").is_string()) {
-        std::cout << "'mode' is required and must be an string." << '\n';
-        throw ConfigValidationException();
-      }
+      errors.emplace_back(!config.contains("threads") || !config.at("threads").is_number(),
+                          "'threads' is required and must be a number.");
 
-      if (!config.contains("database") || !config.at("database").is_object()) {
-        std::cout << "'database' is required and must be an object." << '\n';
-        throw ConfigValidationException();
-      }
+      errors.emplace_back(!config.contains("mode") || !config.at("mode").is_string(),
+                          "'mode' is required and must be an string.");
 
-      if (!config.at("database").as_object().contains("name")
-          || !config.at("database").as_object().at("name").is_string()) {
-        std::cout << "'database.name' is required and must be an string." << '\n';
-        throw ConfigValidationException();
-      }
+      errors.emplace_back(!config.contains("database") || !config.at("database").is_object(),
+                          "'database' is required and must be an object.");
 
-      if (!config.at("database").as_object().contains("username")
-          || !config.at("database").as_object().at("username").is_string()) {
-        std::cout << "'database.username' is required and must be an string." << '\n';
-        throw ConfigValidationException();
-      }
+      errors.emplace_back(!config.at("database").as_object().contains("name")
+                              || !config.at("database").as_object().at("name").is_string(),
+                          "'database.name' is required and must be an string.");
 
-      if (!config.at("database").as_object().contains("password")
-          || !config.at("database").as_object().at("password").is_string()) {
-        std::cout << "'database.password' is required and must be an string." << '\n';
-        throw ConfigValidationException();
-      }
+      errors.emplace_back(!config.at("database").as_object().contains("username")
+                              || !config.at("database").as_object().at("username").is_string(),
+                          "'database.username' is required and must be an string.");
 
-      if (!config.at("database").as_object().contains("host")
-          || !config.at("database").as_object().at("host").is_string()) {
-        std::cout << "'database.host' is required and must be an string." << '\n';
-        throw ConfigValidationException();
-      }
+      errors.emplace_back(!config.at("database").as_object().contains("password")
+                              || !config.at("database").as_object().at("password").is_string(),
+                          "'database.password' is required and must be an string.");
 
-      if (!config.at("database").as_object().contains("port")
-          || !config.at("database").as_object().at("port").is_string()) {
-        std::cout << "'database.port' is required and must be an string." << '\n';
-        throw ConfigValidationException();
+      errors.emplace_back(!config.at("database").as_object().contains("host")
+                              || !config.at("database").as_object().at("host").is_string(),
+                          "'database.host' is required and must be an string.");
+
+      errors.emplace_back(!config.at("database").as_object().contains("port")
+                              || !config.at("database").as_object().at("port").is_string(),
+                          "'database.port' is required and must be an string.");
+
+      for (auto item : errors) {
+        if (std::get<0>(item)) throw ConfigValidationException();
       }
     };
   };
