@@ -7,10 +7,7 @@ Server::Server() {}
 void Server::run(char* argv[]) {
   std::ifstream file(argv[1]);
 
-  if (!file.is_open()) {
-    std::cout << "Archivo de configuración no encontrado ..." << '\n';
-    throw ConfigNotFoundException();
-  }
+  if (!file.is_open()) throw ConfigNotFoundException();
 
   std::string config_contents;
   std::string line;
