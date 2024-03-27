@@ -56,9 +56,7 @@ void Server::run(char* argv[]) {
 
   if (mode == "check") {
     boost::asio::steady_timer timer(ioc, boost::asio::chrono::seconds(10));
-    timer.async_wait([&](boost::system::error_code) {
-      ioc.stop();
-    });
+    timer.async_wait([&](boost::system::error_code) { ioc.stop(); });
   }
 
   this->status = ServerStatus::RUNNING;
