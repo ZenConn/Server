@@ -11,9 +11,7 @@ void Server::run(char* argv[]) {
 
   std::string config_contents;
   std::string line;
-  while (std::getline(file, line)) {
-    config_contents += line;
-  }
+  while (std::getline(file, line)) config_contents += line;
 
   boost::json::value config = boost::json::parse(config_contents);
 
@@ -42,8 +40,8 @@ void Server::run(char* argv[]) {
   boost::asio::ip::basic_resolver_results<boost::asio::ip::tcp> database_endpoints
       = database_resolver.resolve(database_host, database_port);
 
-  auto shared_state = std::make_shared<state>(database_ioc, database_ssl_ioc, database_params,
-                                              database_endpoints);
+  auto shared_state = std::make_shared<state>(config.as_object(), database_ioc, database_ssl_ioc,
+                                              database_params, database_endpoints);
 
   std::make_shared<listener>(ioc, boost::asio::ip::tcp::endpoint{address, port}, doc_root,
                              shared_state)
@@ -57,15 +55,15 @@ void Server::run(char* argv[]) {
   for (auto i = threads - 1; i > 0; --i) v.emplace_back([&ioc] { ioc.run(); });
 
   if (mode == "check") {
-    boost::asio::steady_timer timer(ioc, boost::asio::chrono::nanoseconds(1));
-    timer.async_wait([&](boost::system::error_code) {
-      this->status = ServerStatus::SHUTDOWN;
-      ioc.stop();
-    });
+    boost::asio::steady_timer timer(ioc, boost::asio::chrono::seconds(10));
+    timer.async_wait([&](boost::system::error_code) { ioc.stop(); });
   }
 
   this->status = ServerStatus::RUNNING;
   ioc.run();
+
+  this->status = ServerStatus::SHUTDOWN;
+  shared_state->shutdown();
 
   for (auto& t : v) t.join();
 }
