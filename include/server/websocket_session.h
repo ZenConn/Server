@@ -16,9 +16,10 @@ class websocket_session : public std::enable_shared_from_this<websocket_session>
   std::shared_ptr<session> session_;
 
 public:
+  boost::uuids::uuid uuid_;
   explicit websocket_session(boost::asio::ip::tcp::socket&& socket,
                              std::shared_ptr<state> const& state)
-      : ws_(std::move(socket)), state_(state) {}
+      : ws_(std::move(socket)), state_(state), uuid_(boost::uuids::random_generator()()) {}
   template <class Body, class Allocator> void do_accept(
       boost::beast::http::request<Body, boost::beast::http::basic_fields<Allocator>> req) {
     ws_.set_option(

@@ -26,10 +26,14 @@ public:
   }
   std::string get_uuid() { return boost::uuids::to_string(uuid_); }
 
-  void connected(std::shared_ptr<session>& session) { this->sessions_.push_back(session); }
+  void connected(std::shared_ptr<session>& session) {
+    this->sessions_.push_back(session);
+    this->database_.add_session(session);
+  }
 
   void disconnected(std::shared_ptr<session>& session) {
     std::remove(this->sessions_.begin(), this->sessions_.end(), session);
+    this->database_.remove_session(session);
   }
 
   void shutdown() { this->database_.server_shutdown(uuid_); }
