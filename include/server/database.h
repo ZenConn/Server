@@ -8,6 +8,7 @@
 
 class database_connection {
   std::shared_ptr<boost::mysql::tcp_ssl_connection> connection_;
+
 public:
   std::shared_ptr<std::mutex> ac_guard_;
   std::shared_ptr<std::mutex> op_guard_;
@@ -62,7 +63,7 @@ public:
     return conn;
   }
 
-  void insert_server(boost::uuids::uuid & uuid) {
+  void insert_server(boost::uuids::uuid& uuid) {
     auto conn = get_connection();
     std::scoped_lock<std::mutex> guard(*conn->op_guard_);
     std::string query = "INSERT INTO servers (uuid) VALUES (?)";
