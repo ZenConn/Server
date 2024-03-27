@@ -20,7 +20,7 @@ CPMAddPackage(NAME Server SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/..)
 
 # ---- Create standalone executable ----
 
-find_package(Boost 1.84.0 COMPONENTS filesystem regex)
+find_package(Boost 1.84.0 COMPONENTS filesystem regex json)
 include_directories(${Boost_INCLUDE_DIRS})
 
 file(GLOB_RECURSE BEAST_FILES ${Boost_INCLUDE_DIRS}/boost/beast/*.hpp

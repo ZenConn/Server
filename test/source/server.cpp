@@ -12,11 +12,8 @@ TEST_CASE("Server") {
 TEST_CASE("Server check") {
   using namespace server;
   Server server;
-  char arg_1[] = "0.0.0.0";
-  char arg_2[] = "9000";
-  char arg_3[] = "1";
-  char arg_4[] = "check";
-  char* argv[] = {nullptr, arg_1, arg_2, arg_3, arg_4};
+  char arg_1[] = "config_check.json";
+  char* argv[] = {nullptr, arg_1};
   server.run(argv);
   CHECK_EQ(server.status, ServerStatus::SHUTDOWN);
   CHECK_NE(server.status, ServerStatus::BOOT);
@@ -31,11 +28,8 @@ TEST_CASE("Server version") {
 TEST_CASE("Server can handle http requests") {
   using namespace server;
   Server server;
-  char arg_1[] = "0.0.0.0";
-  char arg_2[] = "9000";
-  char arg_3[] = "1";
-  char arg_4[] = "run";
-  char* argv[] = {nullptr, arg_1, arg_2, arg_3, arg_4};
+  char arg_1[] = "config_run.json";
+  char* argv[] = {nullptr, arg_1};
 
   auto thread = std::thread([&]() { server.run(argv); });
   thread.detach();
@@ -48,7 +42,7 @@ TEST_CASE("Server can handle http requests") {
   boost::asio::ip::tcp::resolver resolver(ioc);
   boost::beast::tcp_stream stream(ioc);
 
-  auto const results = resolver.resolve("localhost", arg_2);
+  auto const results = resolver.resolve("localhost", "3000");
 
   stream.connect(results);
 
@@ -141,11 +135,8 @@ TEST_CASE("Server can handle http requests") {
 TEST_CASE("Server can handle websocket sessions") {
   using namespace server;
   Server server;
-  char arg_1[] = "0.0.0.0";
-  char arg_2[] = "9000";
-  char arg_3[] = "1";
-  char arg_4[] = "run";
-  char* argv[] = {nullptr, arg_1, arg_2, arg_3, arg_4};
+  char arg_1[] = "config_run.json";
+  char* argv[] = {nullptr, arg_1};
 
   auto thread = std::thread([&]() { server.run(argv); });
   thread.detach();
@@ -159,7 +150,7 @@ TEST_CASE("Server can handle websocket sessions") {
   boost::asio::ip::tcp::resolver resolver{ioc};
   boost::beast::websocket::stream<boost::asio::ip::tcp::socket> ws{ioc};
 
-  auto const results = resolver.resolve("localhost", "9000");
+  auto const results = resolver.resolve("localhost", "3000");
 
   boost::asio::connect(ws.next_layer(), results);
 
