@@ -5,6 +5,8 @@
 #include <boost/mysql.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <chrono>
+#include <thread>
 
 class database_connection {
   std::shared_ptr<boost::mysql::tcp_ssl_connection> connection_;
@@ -49,18 +51,15 @@ public:
   }
 
   std::shared_ptr<database_connection> get_connection() {
-    for (auto& conn : connections_) {
-      std::scoped_lock<std::mutex> guard(*conn->ac_guard_);
-      if (!conn->locked) {
-        conn->lock();
-        return conn;
+    while (true) {
+      for (auto& conn : connections_) {
+        std::scoped_lock<std::mutex> guard(*conn->ac_guard_);
+        if (!conn->locked) {
+          conn->lock();
+          return conn;
+        }
       }
     }
-
-    auto conn = create_connection();
-    conn->lock();
-    connections_.emplace_back(conn);
-    return conn;
   }
 
   void insert_server(boost::uuids::uuid& uuid) {
