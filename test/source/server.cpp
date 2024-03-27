@@ -159,15 +159,25 @@ TEST_CASE("Server can handle websocket sessions") {
         req.set(boost::beast::http::field::user_agent, std::string(BOOST_BEAST_VERSION_STRING));
       }));
 
-  ws.handshake("localhost:9000", "/");
+  ws.handshake("localhost:3000", "/");
+
+  boost::beast::flat_buffer first_buffer;
+
+  ws.read(first_buffer);
+
+  auto welcome_message = boost::beast::buffers_to_string(first_buffer.data());
+
+  boost::json::value ob = boost::json::parse(welcome_message);
+
+  CHECK_EQ(ob.as_object().at("status").as_int64(), 202);
 
   ws.write(boost::asio::buffer(std::string("hello")));
 
-  boost::beast::flat_buffer buffer;
+  boost::beast::flat_buffer second_buffer;
 
-  ws.read(buffer);
+  ws.read(second_buffer);
   ws.close(boost::beast::websocket::close_code::normal);
 
-  auto output = boost::beast::buffers_to_string(buffer.data());
+  auto output = boost::beast::buffers_to_string(second_buffer.data());
   CHECK_EQ(output, std::string("hello"));
 }
