@@ -60,9 +60,9 @@ jobs:
 
       - name: test
         run: |
+          cp configs/config_run.json build/config_run.json
+          cp configs/config_check.json build/config_check.json
           cd build
-          echo $CONFIG_CHECK >> config_check.json
-          echo $CONFIG_RUN >> config_run.json
           mkdir public
           touch public/app.json
           ctest --build-config Debug

@@ -5,8 +5,8 @@
 #include <boost/json/parser.hpp>
 #include <boost/json/serialize.hpp>
 #include <boost/json/value.hpp>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <string>
 
 #include "listener.h"
