@@ -60,7 +60,7 @@ void Server::run(char* argv[]) {
   for (auto i = threads - 1; i > 0; --i) v.emplace_back([&ioc] { ioc.run(); });
 
   if (mode == "check") {
-    boost::asio::steady_timer timer(ioc, boost::asio::chrono::nanoseconds (1));
+    boost::asio::steady_timer timer(ioc, boost::asio::chrono::nanoseconds(1));
     timer.async_wait([&](boost::system::error_code) {
       this->status = ServerStatus::SHUTDOWN;
       ioc.stop();
