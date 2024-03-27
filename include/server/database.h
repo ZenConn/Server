@@ -8,6 +8,8 @@
 #include <chrono>
 #include <thread>
 
+#include "session.h"
+
 class database_connection {
   std::shared_ptr<boost::mysql::tcp_ssl_connection> connection_;
 
@@ -80,6 +82,28 @@ public:
     auto statement = conn->get()->prepare_statement(query);
     boost::mysql::results result;
     conn->get()->execute(statement.bind(boost::uuids::to_string(uuid)), result);
+    conn->get()->close_statement(statement);
+    conn->release();
+  }
+
+  void add_session(std::shared_ptr<session>& session) {
+    auto conn = get_connection();
+    std::scoped_lock<std::mutex> guard(*conn->op_guard_);
+    std::string query = "INSERT INTO sessions (uuid) VALUES (?)";
+    auto statement = conn->get()->prepare_statement(query);
+    boost::mysql::results result;
+    conn->get()->execute(statement.bind(session->get_uuid()), result);
+    conn->get()->close_statement(statement);
+    conn->release();
+  }
+
+  void remove_session(std::shared_ptr<session>& session) {
+    auto conn = get_connection();
+    std::scoped_lock<std::mutex> guard(*conn->op_guard_);
+    std::string query = "UPDATE sessions SET disconnected_at = now() WHERE uuid = ?";
+    auto statement = conn->get()->prepare_statement(query);
+    boost::mysql::results result;
+    conn->get()->execute(statement.bind(session->get_uuid()), result);
     conn->get()->close_statement(statement);
     conn->release();
   }
