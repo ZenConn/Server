@@ -15,7 +15,7 @@ include(../cmake/tools.cmake)
 
 include(../cmake/CPM.cmake)
 
-find_package(Boost 1.84.0 COMPONENTS filesystem regex)
+find_package(Boost 1.84.0 COMPONENTS filesystem regex json)
 include_directories(${Boost_INCLUDE_DIRS})
 
 find_package(OpenSSL REQUIRED)
