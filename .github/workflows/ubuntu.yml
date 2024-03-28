@@ -36,6 +36,7 @@ jobs:
 
       - run: mysql -uroot < db.sql
 
+      - run: mysql -uroot -e "show variables like 'socket';"
 
       - name: Install boost
         uses: MarkusJx/install-boost@v2.4.5
