@@ -36,7 +36,7 @@ jobs:
           password: "secret_password"
 
       - name: connect via unix domain socket
-        run: mysql -uroot --protocol=socket --socket ${{ steps.mysql.outputs.base-dir }}/tmp/mysql.sock -e 'SELECT version();'
+        run: mysql -uroot -S ${{ steps.mysql.outputs.base-dir }}/tmp/mysql.sock -e 'SELECT version();'
 
       - run: sed -i "s|SOCK_PATH|$MYSQL_SOCK_PATH|g" configs/config.json
         env:
