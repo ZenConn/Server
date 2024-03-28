@@ -25,25 +25,17 @@ jobs:
       - name: Shutdown Ubuntu MySQL (SUDO)
         run: sudo service mysql stop
 
-      - uses: mirromutth/mysql-action@v1.1
+      - id: setup-mysql
+        uses: shogo82148/actions-setup-mysql@v1
         with:
-          character set server: 'utf8'
-          collation server: 'utf8_general_ci'
-          mysql version: '8.0'
-          mysql database: 'zenconn'
-          mysql user: 'developer'
-          mysql password: 'secret_password'
-          mysql root password: 'secret_password'
+          mysql-version: "8.0"
 
-      - name: Wait for MySQL
-        run: |
-            while ! mysqladmin ping --host=127.0.0.1 --password=secret_password --silent; do
-              sleep 1
-            done
+      - run: sed -i 's|MYSQL_SOCK_PATH|$MYSQL_SOCK_PATH|g' configs/config.json
+        env:
+          MYSQL_SOCK_PATH: ${{ steps.setup-mysql.outputs.base-dir }}/tmp/mysql.sock
 
-      - run: mysql --host=127.0.0.1 --user=root --password=secret_password < db.sql
+      - run: mysql -uroot < db.sql
 
-      - run: mysql --host=127.0.0.1 --user=root --password=secret_password -e "show variables like 'socket';"
 
       - name: Install boost
         uses: MarkusJx/install-boost@v2.4.5
@@ -68,8 +60,9 @@ jobs:
         run: |
           cp configs/config.json build/config.json
           cd build
+          mkdir logs
           ctest --build-config Debug
-          cat *.error_log
+          cat logs/*.error_log
 
       - name: collect code coverage
         run: bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"

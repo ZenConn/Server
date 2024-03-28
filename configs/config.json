@@ -6,6 +6,6 @@
     "name": "zenconn",
     "username": "developer",
     "password": "secret_password",
-    "sock": "/var/run/mysqld/mysqld.sock"
+    "sock": "MYSQL_SOCK_PATH"
   }
 }
