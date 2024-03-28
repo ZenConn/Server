@@ -54,6 +54,7 @@ jobs:
       - name: test
         run: |
           cp configs/config.json build/config.json
+          cp configs/catch.json build/catch.json
           cd build
           touch error_log
           ctest --build-config Debug
