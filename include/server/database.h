@@ -29,17 +29,25 @@ public:
 
 class database_connection {
   boost::asio::io_context ioc_;
+  boost::asio::ssl::context ssl_ioc_;
 
 public:
-  boost::mysql::unix_connection sock;
-  explicit database_connection(boost::json::object& config) : ioc_(false), sock(ioc_) {
+  boost::mysql::tcp_ssl_connection sock;
+  explicit database_connection(boost::json::object& config)
+      : ioc_(false),
+        ssl_ioc_(boost::asio::ssl::context::tls_client),
+        sock(ioc_.get_executor(), ssl_ioc_) {
     auto database_config = config.at("database").as_object();
-    boost::asio::local::stream_protocol::endpoint ep(database_config.at("sock").as_string());
+
+    boost::asio::ip::tcp::resolver resolver(ioc_.get_executor());
+    auto endpoints = resolver.resolve(database_config.at("host").as_string(),
+                                      database_config.at("port").as_string());
+
     boost::mysql::handshake_params database_params(database_config.at("username").as_string(),
                                                    database_config.at("password").as_string(),
                                                    database_config.at("name").as_string());
     try {
-      sock.connect(ep, database_params);
+      sock.connect(*endpoints.begin(), database_params);
     } catch (const boost::mysql::error_with_diagnostics& err) {
       error::print(err);
     }

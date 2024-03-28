@@ -4,8 +4,9 @@
   "threads": 4,
   "database": {
     "name": "zenconn",
-    "username": "developer",
-    "password": "secret_password",
-    "sock": "MYSQL_SOCK_PATH"
+    "username": "root",
+    "password": "",
+    "host": "0.0.0.0",
+    "port": "3306"
   }
 }

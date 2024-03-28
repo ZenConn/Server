@@ -30,13 +30,7 @@ jobs:
         with:
           mysql-version: "8.0"
 
-      - run: sed -i 's|MYSQL_SOCK_PATH|$MYSQL_SOCK_PATH|g' configs/config.json
-        env:
-          MYSQL_SOCK_PATH: ${{ steps.setup-mysql.outputs.base-dir }}/tmp/mysql.sock
-
       - run: mysql -uroot < db.sql
-
-      - run: mysql -uroot -e "show variables like 'socket';"
 
       - name: Install boost
         uses: MarkusJx/install-boost@v2.4.5
