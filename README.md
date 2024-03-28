@@ -17,6 +17,12 @@ Server is capable of distributing static content from the `public` folder and es
 
 ## Next
 
+Consider the following as a todo list.
+
+### Sessions
+
+WebSockets connections must be recorded in database and linked to the server.
+
 ### Logging
 
 Something like nginx or apache format.
@@ -37,9 +43,15 @@ Someone with and without grants, must be able to join to private or public chann
 
 Someone with or without grants, must be able to broadcast into public or/and private channels.
 
-### Distributed
+### Process communication
 
-A node can be agent or worker
+Instances can be agent or worker
+
+Servers running as agent should be able to run, synchronize child processes as workers.
+
+Worker process must notify when a new connection is established while agent should push the connection into a list when is notified.
+
+### Distributed
 
 > While agent is responsible for workers and must have known who are and what are doing,
 > 
@@ -47,7 +59,7 @@ A node can be agent or worker
 
 Someone must be able to connect into a worker or agent node and broadcast the message to the subscribed clients.
 
-Someone must be able to connect into a worker or agent and get authorized and subscribed to a private channel but the noise must be sent to the already subscribed members.
+Someone must be able to connect into a worker or agent and get authorized and subscribed to a private channel but a new connection notification must be sent.
 
 ### Dockerized
 
@@ -68,11 +80,6 @@ Someone should be able to audit the system. It includes all the messages produce
 ### Performance
 
 Someone should be able to run the program, but it should not produce any kind of performance issue or memory leak.
-
-### Server as agent
-
-Agent must be responsible not just to be the leader on the system but when something goes wrong, need to be responsible
-for workers spawn. 
 
 ### Secured
 
