@@ -12,7 +12,7 @@ TEST_CASE("Server") {
 TEST_CASE("Server check") {
   using namespace server;
   Server server;
-  char arg_1[] = "config_run.json";
+  char arg_1[] = "config.json";
   char* argv[] = {nullptr, arg_1};
 
   auto thread = std::thread([&]() { server.run(argv); });
@@ -36,7 +36,7 @@ TEST_CASE("Server version") {
 TEST_CASE("Server can handle http requests") {
   using namespace server;
   Server server;
-  char arg_1[] = "config_run.json";
+  char arg_1[] = "config.json";
   char* argv[] = {nullptr, arg_1};
 
   auto thread = std::thread([&]() { server.run(argv); });
@@ -50,7 +50,7 @@ TEST_CASE("Server can handle http requests") {
   boost::asio::ip::tcp::resolver resolver(ioc);
   boost::beast::tcp_stream stream(ioc);
 
-  auto const results = resolver.resolve("localhost", "9000");
+  auto const results = resolver.resolve("localhost", "3000");
 
   stream.connect(results);
 
@@ -145,7 +145,7 @@ TEST_CASE("Server can handle http requests") {
 TEST_CASE("Server can handle websocket sessions") {
   using namespace server;
   Server server;
-  char arg_1[] = "config_run.json";
+  char arg_1[] = "config.json";
   char* argv[] = {nullptr, arg_1};
 
   auto thread = std::thread([&]() { server.run(argv); });
@@ -160,7 +160,7 @@ TEST_CASE("Server can handle websocket sessions") {
   boost::asio::ip::tcp::resolver resolver{ioc};
   boost::beast::websocket::stream<boost::asio::ip::tcp::socket> ws{ioc};
 
-  auto const results = resolver.resolve("localhost", "9000");
+  auto const results = resolver.resolve("localhost", "3000");
 
   boost::asio::connect(ws.next_layer(), results);
 
@@ -169,7 +169,7 @@ TEST_CASE("Server can handle websocket sessions") {
         req.set(boost::beast::http::field::user_agent, std::string(BOOST_BEAST_VERSION_STRING));
       }));
 
-  ws.handshake("localhost:9000", "/");
+  ws.handshake("localhost:3000", "/");
 
   boost::beast::flat_buffer first_buffer;
 

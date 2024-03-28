@@ -1,11 +1,11 @@
 #pragma once
 
 #include <boost/asio.hpp>
+#include <boost/current_function.hpp>
 #include <boost/json.hpp>
 #include <boost/mysql.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
-#include <boost/current_function.hpp>
 #include <chrono>
 #include <iostream>
 #include <stack>
@@ -21,7 +21,8 @@ class database_connection {
 public:
   explicit database_connection(boost::json::object& config) : ioc_(true) {
     connection_ = std::make_shared<boost::mysql::unix_connection>(ioc_);
-    boost::asio::local::stream_protocol::endpoint ep(config.at("database").as_object().at("sock").as_string());
+    boost::asio::local::stream_protocol::endpoint ep(
+        config.at("database").as_object().at("sock").as_string());
     boost::mysql::handshake_params database_params(
         config.at("database").as_object().at("username").as_string(),
         config.at("database").as_object().at("password").as_string(),

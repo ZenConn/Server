@@ -51,8 +51,7 @@ jobs:
 
       - name: get config
         run: |
-          cp configs/config_run.json config_run.json
-          cp configs/config_check.json config_check.json
+          cp configs/config.json config.json
 
       - name: run
-        run: ./build/Server config_check.json
+        run: ./build/Server config.json

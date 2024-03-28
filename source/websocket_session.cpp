@@ -7,7 +7,7 @@ void websocket_session::on_accept(boost::beast::error_code ec) {
   session_ = std::make_shared<session>();
   state_->connected(session_);
 
-  boost::json::object welcome {{"status", 202}, {"uuid", session_->get_uuid()}};
+  boost::json::object welcome{{"status", 202}, {"uuid", session_->get_uuid()}};
   std::string message = boost::json::serialize(welcome);
 
   ws_.async_write(
