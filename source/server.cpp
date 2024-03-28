@@ -21,7 +21,6 @@ void Server::run(char* argv[]) {
   auto const port = static_cast<unsigned short>(std::atoi(config.at("port").as_string().c_str()));
   auto const doc_root = std::make_shared<std::string>("public");
   auto const threads = std::max<int>(1, config.at("threads").as_int64());
-  auto const mode = std::string(config.at("mode").as_string());
 
   state_ = std::make_shared<state>(config.as_object());
 

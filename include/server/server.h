@@ -47,9 +47,6 @@ namespace server {
       errors.emplace_back(!config.contains("threads") || !config.at("threads").is_number(),
                           "'threads' is required and must be a number.");
 
-      errors.emplace_back(!config.contains("mode") || !config.at("mode").is_string(),
-                          "'mode' is required and must be an string.");
-
       errors.emplace_back(!config.contains("database") || !config.at("database").is_object(),
                           "'database' is required and must be an object.");
 
