@@ -26,6 +26,8 @@ jobs:
           user: "app"
           password: "secret_password"
 
+      - run: echo "${{ steps.setup-mysql.outputs.base-dir }}/tmp/mysql.sock"
+
       - run: mysql -uroot < db.sql
 
       - name: Install boost

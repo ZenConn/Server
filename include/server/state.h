@@ -13,10 +13,8 @@ class state : public std::enable_shared_from_this<state> {
   std::vector<std::shared_ptr<session>> sessions_;
 
 public:
-  state(boost::json::object& config)
+  explicit state(boost::json::object& config)
       : uuid_(boost::uuids::random_generator()()), config_(config), database_(config) {
-    this->database_.prepare_connections(
-        config_.at("database").as_object().at("connections").as_int64());
     this->database_.server_start(uuid_);
   }
   std::string get_uuid() { return boost::uuids::to_string(uuid_); }

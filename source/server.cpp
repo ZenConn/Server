@@ -23,12 +23,6 @@ void Server::run(char* argv[]) {
   auto const threads = std::max<int>(1, config.at("threads").as_int64());
   auto const mode = std::string(config.at("mode").as_string());
 
-  std::string database_username{config.at("database").as_object().at("username").as_string()},
-      database_password{config.at("database").as_object().at("password").as_string()},
-      database_name{config.at("database").as_object().at("name").as_string()},
-      database_host{config.at("database").as_object().at("host").as_string()},
-      database_port{config.at("database").as_object().at("port").as_string()};
-
   state_ = std::make_shared<state>(config.as_object());
 
   std::make_shared<listener>(ioc_, boost::asio::ip::tcp::endpoint{address, port}, doc_root, state_)

@@ -65,13 +65,9 @@ namespace server {
                               || !config.at("database").as_object().at("password").is_string(),
                           "'database.password' is required and must be an string.");
 
-      errors.emplace_back(!config.at("database").as_object().contains("host")
-                              || !config.at("database").as_object().at("host").is_string(),
-                          "'database.host' is required and must be an string.");
-
-      errors.emplace_back(!config.at("database").as_object().contains("port")
-                              || !config.at("database").as_object().at("port").is_string(),
-                          "'database.port' is required and must be an string.");
+      errors.emplace_back(!config.at("database").as_object().contains("sock")
+                              || !config.at("database").as_object().at("sock").is_string(),
+                          "'database.sock' is required and must be an string.");
 
       errors.emplace_back(!config.at("database").as_object().contains("connections")
                               || !config.at("database").as_object().at("connections").is_number(),
