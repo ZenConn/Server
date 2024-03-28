@@ -61,9 +61,8 @@ jobs:
         run: |
           cp configs/config.json build/config.json
           cd build
-          mkdir logs
           ctest --build-config Debug
-          cat logs/*.error_log
+          cat *.error_log
 
       - name: collect code coverage
         run: bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
