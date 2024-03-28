@@ -32,7 +32,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - run: mysql -uroot -S /tmp/mysql.sock < db.sql
+      - run: mysql -uroot -S /var/run/mysqld/mysqld.sock < db.sql
 
       - name: Install boost
         uses: MarkusJx/install-boost@v2.4.5
