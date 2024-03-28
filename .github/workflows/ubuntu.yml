@@ -22,7 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - id: mysql
+      - id: mysql-service
         uses: shogo82148/actions-setup-mysql@v1
         with:
           mysql-version: "8.0"
@@ -36,15 +36,17 @@ jobs:
           password: "secret_password"
 
       - name: connect via unix domain socket
-        run: mysql -uroot -S ${{ steps.mysql.outputs.base-dir }}/tmp/mysql.sock -e 'SELECT version();'
+        run: mysql -uroot -S ${{ steps.mysql-service.outputs.base-dir }}/tmp/mysql.sock -e 'SELECT version();'
 
       - run: sed -i "s|SOCK_PATH|$MYSQL_SOCK_PATH|g" configs/config.json
         env:
-          MYSQL_SOCK_PATH: ${{ steps.mysql.outputs.base-dir }}
+          MYSQL_SOCK_PATH: ${{ steps.mysql-service.outputs.base-dir }}
+
+      - run: cat configs/config.json
 
       - run: ls -l $MYSQL_SOCK_PATH
         env:
-          MYSQL_SOCK_PATH: ${{ steps.mysql.outputs.base-dir }}
+          MYSQL_SOCK_PATH: ${{ steps.mysql-service.outputs.base-dir }}
 
       - run: mysql -uroot < db.sql
 
