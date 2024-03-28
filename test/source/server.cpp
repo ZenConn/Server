@@ -170,15 +170,21 @@ TEST_CASE("Server can handle websocket sessions") {
 
   ws.handshake("localhost:3000", "/");
 
-  boost::beast::flat_buffer first_buffer;
+  boost::beast::flat_buffer buffer;
 
-  ws.read(first_buffer);
+  ws.read(buffer);
 
-  auto welcome_message = boost::beast::buffers_to_string(first_buffer.data());
-
+  auto welcome_message = boost::beast::buffers_to_string(buffer.data());
   boost::json::value ob = boost::json::parse(welcome_message);
-
   CHECK_EQ(ob.as_object().at("status").as_int64(), 202);
+
+  ws.write(boost::asio::buffer(std::string("ping")));
+
+  buffer.consume(buffer.size());
+  ws.read(buffer);
+
+  auto pong = boost::beast::buffers_to_string(buffer.data());
+  CHECK_EQ(pong, "ping");
 
   ws.close(boost::beast::websocket::close_code::normal);
 
