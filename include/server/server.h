@@ -24,10 +24,17 @@ enum ServerStatus {
 namespace server {
   class Server {
   public:
+    boost::asio::io_context ioc_{true};
+    std::shared_ptr<state> state_;
     ServerStatus status = ServerStatus::BOOT;
     Server();
 
     void run(char* argv[]);
+    void stop() {
+      this->status = ServerStatus::SHUTDOWN;
+      state_->shutdown();
+      ioc_.stop();
+    }
     void static validates(boost::json::object& config) {
       std::vector<std::tuple<bool, std::string>> errors;
 

@@ -6,7 +6,10 @@
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <chrono>
+#include <iostream>
+#include <stack>
 #include <thread>
+#include <unordered_set>
 
 #include "session.h"
 
@@ -20,7 +23,8 @@ public:
   std::shared_ptr<std::mutex> op_guard_;
   bool locked = false;
   explicit database_connection(boost::json::object& config)
-      : ssl_ioc_(boost::asio::ssl::context::tls_client),
+      : ioc_(true),
+        ssl_ioc_(boost::asio::ssl::context::tls_client),
         ac_guard_(std::make_shared<std::mutex>()),
         op_guard_(std::make_shared<std::mutex>()) {
     connection_ = std::make_shared<boost::mysql::tcp_ssl_connection>(ioc_.get_executor(), ssl_ioc_);
@@ -34,7 +38,12 @@ public:
         config.at("database").as_object().at("password").as_string(),
         config.at("database").as_object().at("name").as_string());
 
-    connection_->connect(*database_endpoint.begin(), database_params);
+    try {
+      connection_->connect(*database_endpoint.begin(), database_params);
+    } catch (const boost::mysql::error_with_diagnostics& err) {
+      std::cout << "Error: " << err.what() << '\n'
+                << "Server diagnostics: " << err.get_diagnostics().server_message() << std::endl;
+    }
   }
 
   void release() { this->locked = false; }
@@ -44,35 +53,39 @@ public:
 
 class database {
   boost::json::object config_;
-  std::vector<std::shared_ptr<database_connection>> connections_;
+  std::stack<std::shared_ptr<database_connection>> connections_;
+  std::unordered_set<std::shared_ptr<database_connection>> instances_;
+  std::mutex guard_;
 
 public:
-  explicit database(boost::json::object& config) : config_(config) {}
+  explicit database(boost::json::object& config)
+      : config_(config), connections_(), guard_(std::mutex()) {}
 
   std::shared_ptr<database_connection> create_connection() {
     return std::make_shared<database_connection>(config_);
   }
 
   void prepare_connections(uint64_t connections) {
-    for (std::size_t position = 0; position < connections; position++) {
-      connections_.emplace_back(create_connection());
+    for (std::size_t position = 0; position <= connections; position++) {
+      instances_.insert(create_connection());
     }
   }
 
-  std::shared_ptr<database_connection> get_connection() {
-    while (true) {
-      for (auto& conn : connections_) {
-        std::scoped_lock<std::mutex> guard(*conn->ac_guard_);
-        if (!conn->locked) {
-          conn->lock();
-          return conn;
-        }
+  database_connection* get_connection() {
+    for (auto& conn : instances_) {
+      std::scoped_lock<std::mutex> guard(*conn->ac_guard_);
+      if (!conn->locked) {
+        conn->lock();
+        return conn.get();
       }
     }
+    auto conn = create_connection();
+    instances_.insert(conn);
+    return conn.get();
   }
 
   void server_start(boost::uuids::uuid& uuid) {
-    auto conn = get_connection();
+    auto conn = this->get_connection();
     std::scoped_lock<std::mutex> guard(*conn->op_guard_);
     std::string query = "INSERT INTO servers (uuid) VALUES (?)";
     auto statement = conn->get()->prepare_statement(query);
@@ -83,7 +96,7 @@ public:
   }
 
   void server_shutdown(boost::uuids::uuid& uuid) {
-    auto conn = get_connection();
+    auto conn = this->get_connection();
     std::scoped_lock<std::mutex> guard(*conn->op_guard_);
     std::string query = "UPDATE servers SET shutdown_at = now() WHERE uuid = ?";
     auto statement = conn->get()->prepare_statement(query);
@@ -94,7 +107,7 @@ public:
   }
 
   void add_session(std::shared_ptr<session>& session) {
-    auto conn = get_connection();
+    auto conn = this->get_connection();
     std::scoped_lock<std::mutex> guard(*conn->op_guard_);
     std::string query = "INSERT INTO sessions (uuid) VALUES (?)";
     auto statement = conn->get()->prepare_statement(query);
@@ -105,7 +118,7 @@ public:
   }
 
   void remove_session(std::shared_ptr<session>& session) {
-    auto conn = get_connection();
+    auto conn = this->get_connection();
     std::scoped_lock<std::mutex> guard(*conn->op_guard_);
     std::string query = "UPDATE sessions SET disconnected_at = now() WHERE uuid = ?";
     auto statement = conn->get()->prepare_statement(query);
