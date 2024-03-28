@@ -8,8 +8,8 @@
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <chrono>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <stack>
 #include <thread>
 #include <unordered_set>
@@ -22,7 +22,7 @@ public:
     std::string name = boost::uuids::to_string(boost::uuids::random_generator()()) + ".error_log";
     std::ofstream outfile(name.data());
     outfile << BOOST_CURRENT_FUNCTION << ": " << error.what() << '\n'
-              << "Server diagnostics: " << error.get_diagnostics().server_message() << std::endl;
+            << "Server diagnostics: " << error.get_diagnostics().server_message() << std::endl;
     outfile.close();
   }
 };
