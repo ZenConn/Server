@@ -22,7 +22,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: shogo82148/actions-setup-mysql@v1
+      - id: setup-mysql
+        uses: shogo82148/actions-setup-mysql@v1
         with:
           mysql-version: "8.1"
           user: "app"
