@@ -40,7 +40,11 @@ jobs:
 
       - run: sed -i "s|SOCK_PATH|$MYSQL_SOCK_PATH|g" configs/config.json
         env:
-          MYSQL_SOCK_PATH: ${{ steps.setup-mysql.outputs.base-dir }}
+          MYSQL_SOCK_PATH: ${{ steps.mysql.outputs.base-dir }}
+
+      - run: ls -l $MYSQL_SOCK_PATH
+        env:
+          MYSQL_SOCK_PATH: ${{ steps.mysql.outputs.base-dir }}
 
       - run: mysql -uroot < db.sql
 
