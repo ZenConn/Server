@@ -44,7 +44,7 @@ jobs:
 
       - run: cat configs/config.json
 
-      - run: ls -l $MYSQL_SOCK_PATH
+      - run: ls -l $MYSQL_SOCK_PATH/tmp
         env:
           MYSQL_SOCK_PATH: ${{ steps.mysql-service.outputs.base-dir }}
 
