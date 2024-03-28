@@ -1,3 +1,5 @@
+CREATE DATABASE zenconn;
+
 USE zenconn;
 
 create table servers (
