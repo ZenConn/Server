@@ -24,10 +24,17 @@ enum ServerStatus {
 namespace server {
   class Server {
   public:
+    boost::asio::io_context ioc_{true};
+    std::shared_ptr<state> state_;
     ServerStatus status = ServerStatus::BOOT;
     Server();
 
     void run(char* argv[]);
+    void stop() {
+      this->status = ServerStatus::SHUTDOWN;
+      state_->shutdown();
+      ioc_.stop();
+    }
     void static validates(boost::json::object& config) {
       std::vector<std::tuple<bool, std::string>> errors;
 
@@ -39,9 +46,6 @@ namespace server {
 
       errors.emplace_back(!config.contains("threads") || !config.at("threads").is_number(),
                           "'threads' is required and must be a number.");
-
-      errors.emplace_back(!config.contains("mode") || !config.at("mode").is_string(),
-                          "'mode' is required and must be an string.");
 
       errors.emplace_back(!config.contains("database") || !config.at("database").is_object(),
                           "'database' is required and must be an object.");
@@ -58,17 +62,9 @@ namespace server {
                               || !config.at("database").as_object().at("password").is_string(),
                           "'database.password' is required and must be an string.");
 
-      errors.emplace_back(!config.at("database").as_object().contains("host")
-                              || !config.at("database").as_object().at("host").is_string(),
-                          "'database.host' is required and must be an string.");
-
-      errors.emplace_back(!config.at("database").as_object().contains("port")
-                              || !config.at("database").as_object().at("port").is_string(),
-                          "'database.port' is required and must be an string.");
-
-      errors.emplace_back(!config.at("database").as_object().contains("connections")
-                              || !config.at("database").as_object().at("connections").is_number(),
-                          "'database.connections' is required and must be a number.");
+      errors.emplace_back(!config.at("database").as_object().contains("sock")
+                              || !config.at("database").as_object().at("sock").is_string(),
+                          "'database.sock' is required and must be an string.");
 
       for (auto item : errors) {
         if (std::get<0>(item)) throw ConfigValidationException();

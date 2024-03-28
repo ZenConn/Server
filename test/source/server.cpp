@@ -12,9 +12,16 @@ TEST_CASE("Server") {
 TEST_CASE("Server check") {
   using namespace server;
   Server server;
-  char arg_1[] = "config_check.json";
+  char arg_1[] = "config.json";
   char* argv[] = {nullptr, arg_1};
-  server.run(argv);
+
+  auto thread = std::thread([&]() { server.run(argv); });
+  thread.detach();
+
+  // Wait for booting
+  while (server.status != ServerStatus::RUNNING) {
+  };
+  server.stop();
   CHECK_EQ(server.status, ServerStatus::SHUTDOWN);
   CHECK_NE(server.status, ServerStatus::BOOT);
   CHECK_NE(server.status, ServerStatus::RUNNING);
@@ -28,7 +35,7 @@ TEST_CASE("Server version") {
 TEST_CASE("Server can handle http requests") {
   using namespace server;
   Server server;
-  char arg_1[] = "config_run.json";
+  char arg_1[] = "config.json";
   char* argv[] = {nullptr, arg_1};
 
   auto thread = std::thread([&]() { server.run(argv); });
@@ -130,12 +137,14 @@ TEST_CASE("Server can handle http requests") {
   stream.socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
 
   if (ec && ec != boost::beast::errc::not_connected) throw boost::beast::system_error{ec};
+
+  server.stop();
 }
 
 TEST_CASE("Server can handle websocket sessions") {
   using namespace server;
   Server server;
-  char arg_1[] = "config_run.json";
+  char arg_1[] = "config.json";
   char* argv[] = {nullptr, arg_1};
 
   auto thread = std::thread([&]() { server.run(argv); });
@@ -159,15 +168,19 @@ TEST_CASE("Server can handle websocket sessions") {
         req.set(boost::beast::http::field::user_agent, std::string(BOOST_BEAST_VERSION_STRING));
       }));
 
-  ws.handshake("localhost:9000", "/");
+  ws.handshake("localhost:3000", "/");
 
-  ws.write(boost::asio::buffer(std::string("hello")));
+  boost::beast::flat_buffer first_buffer;
 
-  boost::beast::flat_buffer buffer;
+  ws.read(first_buffer);
 
-  ws.read(buffer);
+  auto welcome_message = boost::beast::buffers_to_string(first_buffer.data());
+
+  boost::json::value ob = boost::json::parse(welcome_message);
+
+  CHECK_EQ(ob.as_object().at("status").as_int64(), 202);
+
   ws.close(boost::beast::websocket::close_code::normal);
 
-  auto output = boost::beast::buffers_to_string(buffer.data());
-  CHECK_EQ(output, std::string("hello"));
+  server.stop();
 }
