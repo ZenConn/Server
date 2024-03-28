@@ -33,9 +33,9 @@ jobs:
           mysql database: 'zenconn'
           mysql root password: 'secret_password'
 
-      - run: mysql -uroot < db.sql
+      - run: mysql -h 127.0.0.1 --user=root --password=secret_password < db.sql
 
-      - run: mysql -uroot -e "show variables like 'socket';"
+      - run: mysql -h 127.0.0.1 --user=root --password=secret_password -e "show variables like 'socket';"
 
       - name: Install boost
         uses: MarkusJx/install-boost@v2.4.5
