@@ -19,28 +19,18 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:8.0.21
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: zenconn
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
     steps:
       - uses: actions/checkout@v3
-
-      - id: mysql-service
-        uses: shogo82148/actions-setup-mysql@v1
-        with:
-          mysql-version: "8.0"
-          user: "app"
-          password: "secret_password"
-
-      - name: connect via unix domain socket
-        run: mysql -uroot -S ${{ steps.mysql-service.outputs.base-dir }}/tmp/mysql.sock -e 'SELECT version();'
-
-      - run: sed -i "s|SOCK_PATH|$MYSQL_SOCK_PATH|g" configs/config.json
-        env:
-          MYSQL_SOCK_PATH: ${{ steps.mysql-service.outputs.base-dir }}
-
-      - run: cat configs/config.json
-
-      - run: ls -l $MYSQL_SOCK_PATH/tmp
-        env:
-          MYSQL_SOCK_PATH: ${{ steps.mysql-service.outputs.base-dir }}
 
       - run: mysql -uroot < db.sql
 
