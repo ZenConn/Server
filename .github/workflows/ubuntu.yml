@@ -31,10 +31,6 @@ jobs:
 
       - run: mysql -uroot < db.sql
 
-      - run: sed -i "s|SOCK_PATH|$MYSQL_SOCK_PATH|g" configs/config.json
-        env:
-          MYSQL_SOCK_PATH: ${{ steps.setup-mysql.outputs.base-dir }}
-
       - name: Install boost
         uses: MarkusJx/install-boost@v2.4.5
         id: install-boost
