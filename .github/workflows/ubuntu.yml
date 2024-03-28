@@ -32,7 +32,20 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - run: mysql -uroot -S /var/run/mysqld/mysqld.sock < db.sql
+      - name: Shutdown Ubuntu MySQL (SUDO)
+        run: sudo service mysql stop
+
+      - uses: mirromutth/mysql-action@v1.1
+        with:
+          character set server: 'utf8'
+          collation server: 'utf8_general_ci'
+          mysql version: '8.0'
+          mysql database: 'zenconn'
+          mysql root password: 'secret_password'
+
+      - run: mysql -uroot < db.sql
+
+      - run: mysql -uroot -e "show variables like 'socket';"
 
       - name: Install boost
         uses: MarkusJx/install-boost@v2.4.5
