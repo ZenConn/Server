@@ -3,7 +3,7 @@
   "port": "9000",
   "threads": 1,
   "database": {
-    "name": "wrong_database",
+    "name": "zenconn",
     "username": "root",
     "password": "wrong_password",
     "host": "0.0.0.0",
