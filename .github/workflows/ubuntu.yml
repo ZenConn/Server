@@ -29,6 +29,16 @@ jobs:
           user: "app"
           password: "secret_password"
 
+      - name: connect via unix domain socket
+        run: mysql -uroot \
+          --protocol=SOCKET \
+          --socket=${{ steps.setup-mysql.outputs.base-dir }}/tmp/mysql.sock
+          -e 'SELECT version()'
+
+      - run: sed -i "s|SOCK_PATH|$MYSQL_SOCK_PATH|g" configs/config.json
+        env:
+          MYSQL_SOCK_PATH: ${{ steps.setup-mysql.outputs.base-dir }}
+
       - run: mysql -uroot < db.sql
 
       - name: Install boost

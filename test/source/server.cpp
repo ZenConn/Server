@@ -22,7 +22,6 @@ TEST_CASE("Server check") {
   while (server.status != ServerStatus::RUNNING) {
   };
   server.stop();
-
   CHECK_EQ(server.status, ServerStatus::SHUTDOWN);
   CHECK_NE(server.status, ServerStatus::BOOT);
   CHECK_NE(server.status, ServerStatus::RUNNING);
