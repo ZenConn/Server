@@ -6,7 +6,7 @@
     "name": "zenconn",
     "username": "root",
     "password": "",
-    "sock": "/tmp/mysql.sock",
+    "sock": "SOCK_PATH/tmp/mysql.sock",
     "connections": 5
   }
 }
