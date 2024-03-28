@@ -66,10 +66,6 @@ namespace server {
                               || !config.at("database").as_object().at("sock").is_string(),
                           "'database.sock' is required and must be an string.");
 
-      errors.emplace_back(!config.at("database").as_object().contains("connections")
-                              || !config.at("database").as_object().at("connections").is_number(),
-                          "'database.connections' is required and must be a number.");
-
       for (auto item : errors) {
         if (std::get<0>(item)) throw ConfigValidationException();
       }
