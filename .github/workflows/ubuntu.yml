@@ -25,7 +25,7 @@ jobs:
       - id: setup-mysql
         uses: shogo82148/actions-setup-mysql@v1
         with:
-          mysql-version: "8.1"
+          mysql-version: "8.0"
           user: "app"
           password: "secret_password"
 
