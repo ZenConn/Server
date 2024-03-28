@@ -8,6 +8,7 @@
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <chrono>
+#include <fstream>
 #include <iostream>
 #include <stack>
 #include <thread>
@@ -15,22 +16,40 @@
 
 #include "session.h"
 
+class error {
+public:
+  void static print(const boost::mysql::error_with_diagnostics& error) {
+    std::string name = boost::uuids::to_string(boost::uuids::random_generator()()) + ".error_log";
+    std::ofstream outfile(name.data());
+    outfile << BOOST_CURRENT_FUNCTION << ": " << error.what() << '\n'
+            << "Server diagnostics: " << error.get_diagnostics().server_message() << std::endl;
+    outfile.close();
+  }
+};
+
 class database_connection {
   boost::asio::io_context ioc_;
+  boost::asio::ssl::context ssl_ioc_;
 
 public:
-  boost::mysql::unix_connection sock;
-  explicit database_connection(boost::json::object& config) : ioc_(false), sock(ioc_) {
+  boost::mysql::tcp_ssl_connection sock;
+  explicit database_connection(boost::json::object& config)
+      : ioc_(false),
+        ssl_ioc_(boost::asio::ssl::context::tls_client),
+        sock(ioc_.get_executor(), ssl_ioc_) {
     auto database_config = config.at("database").as_object();
-    boost::asio::local::stream_protocol::endpoint ep(database_config.at("sock").as_string());
+
+    boost::asio::ip::tcp::resolver resolver(ioc_.get_executor());
+    auto endpoints = resolver.resolve(database_config.at("host").as_string(),
+                                      database_config.at("port").as_string());
+
     boost::mysql::handshake_params database_params(database_config.at("username").as_string(),
                                                    database_config.at("password").as_string(),
                                                    database_config.at("name").as_string());
     try {
-      sock.connect(ep, database_params);
+      sock.connect(*endpoints.begin(), database_params);
     } catch (const boost::mysql::error_with_diagnostics& err) {
-      std::cout << "Error: " << err.what() << '\n'
-                << "Server diagnostics: " << err.get_diagnostics().server_message() << std::endl;
+      error::print(err);
     }
   }
 };
@@ -41,11 +60,6 @@ class database {
 public:
   explicit database(boost::json::object& config) : config_(config) {}
 
-  static void print_error(const boost::mysql::error_with_diagnostics& err) {
-    std::cerr << BOOST_CURRENT_FUNCTION << ": " << err.what() << '\n'
-              << "Server diagnostics: " << err.get_diagnostics().server_message() << std::endl;
-  }
-
   void server_start(boost::uuids::uuid& uuid) {
     auto conn = std::make_shared<database_connection>(config_);
     try {
@@ -55,7 +69,7 @@ public:
       conn->sock.execute(statement.bind(boost::uuids::to_string(uuid)), result);
       conn->sock.close_statement(statement);
     } catch (const boost::mysql::error_with_diagnostics& err) {
-      print_error(err);
+      error::print(err);
     }
   }
 
@@ -68,7 +82,7 @@ public:
       conn->sock.execute(statement.bind(boost::uuids::to_string(uuid)), result);
       conn->sock.close_statement(statement);
     } catch (const boost::mysql::error_with_diagnostics& err) {
-      print_error(err);
+      error::print(err);
     }
   }
 
@@ -81,7 +95,7 @@ public:
       conn->sock.execute(statement.bind(session->get_uuid()), result);
       conn->sock.close_statement(statement);
     } catch (const boost::mysql::error_with_diagnostics& err) {
-      print_error(err);
+      error::print(err);
     }
   }
 
@@ -95,7 +109,7 @@ public:
       conn->sock.execute(statement.bind(session->get_uuid()), result);
       conn->sock.close_statement(statement);
     } catch (const boost::mysql::error_with_diagnostics& err) {
-      print_error(err);
+      error::print(err);
     }
   }
 };

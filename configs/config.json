@@ -6,6 +6,7 @@
     "name": "zenconn",
     "username": "root",
     "password": "",
-    "sock": "SOCK_PATH/tmp/mysql.sock"
+    "host": "0.0.0.0",
+    "port": "3306"
   }
 }
