@@ -31,11 +31,12 @@ jobs:
           collation server: 'utf8_general_ci'
           mysql version: '8.0'
           mysql database: 'zenconn'
-          mysql root password: 'secret_password'
+          mysql user: 'developer'
+          mysql password: 'secret_password'
 
-      - run: mysql -h 127.0.0.1 --user=root --password=secret_password < db.sql
+      - run: mysql --user=root < db.sql
 
-      - run: mysql -h 127.0.0.1 --user=root --password=secret_password -e "show variables like 'socket';"
+      - run: mysql --user=root -e "show variables like 'socket';"
 
       - name: Install boost
         uses: MarkusJx/install-boost@v2.4.5

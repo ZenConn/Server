@@ -4,7 +4,7 @@
   "threads": 4,
   "database": {
     "name": "zenconn",
-    "username": "root",
+    "username": "developer",
     "password": "secret_password",
     "sock": "/var/run/mysqld/mysqld.sock"
   }
